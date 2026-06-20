@@ -1,0 +1,23 @@
+{
+  "name": "bigin",
+  "description": "bigin plugins for Claude Code",
+  "owner": {
+    "name": "Tam Mai",
+    "email": "tam.mai@bigin.vn"
+  },
+  "plugins": [
+    {
+      "name": "bigin-webapp-harness",
+      "source": "./",
+      "description": "Web app harness factory for Claude Code — Nuxt v4 fullstack MVP, SPA frontend, and Go backend.",
+      "author": {
+        "name": "Tam Mai",
+        "email": "tam.mai@bigin.vn"
+      },
+      "homepage": "https://github.com/tammai/bigin-webapp-harness",
+      "repository": "https://github.com/tammai/bigin-webapp-harness",
+      "license": "MIT",
+      "keywords": ["harness", "nuxt", "nuxt-v4", "cloudflare", "go-backend", "spa", "fullstack", "subagent"]
+    }
+  ]
+}
