@@ -1,22 +1,23 @@
 # SPA Frontend Stack Spec
+
 # Đặc tả stack SPA Frontend
 
 ## Stack Overview
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Nuxt v4, SSR disabled (`ssr: false`) |
-| UI Library | Nuxt UI (latest) |
-| CSS | Tailwind CSS v4 |
-| Font | Google Sans (via `@theme static --font-sans`, no CDN import) |
-| Theme Primary | Blue |
-| Theme Neutral | Slate |
-| State | Pinia + Pinia Colada |
-| Utilities | VueUse |
-| Rendering | Client-side only (SPA) |
+| Layer         | Technology                                                   |
+| ------------- | ------------------------------------------------------------ |
+| Framework     | Nuxt v4, SSR disabled (`ssr: false`)                         |
+| UI Library    | Nuxt UI (latest)                                             |
+| CSS           | Tailwind CSS v4                                              |
+| Font          | Google Sans (via `@theme static --font-sans`, no CDN import) |
+| Theme Primary | Blue                                                         |
+| Theme Neutral | Slate                                                        |
+| State         | Pinia + Pinia Colada                                         |
+| Utilities     | VueUse                                                       |
+| Rendering     | Client-side only (SPA)                                       |
 
 No server-side rendering. No Nitro presets. No Cloudflare services.  
-*Không có server-side rendering. Không dùng Nitro preset. Không có Cloudflare services.*
+_Không có server-side rendering. Không dùng Nitro preset. Không có Cloudflare services._
 
 ---
 
@@ -45,7 +46,13 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
-})
+
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_URL,
+    },
+  },
+});
 ```
 
 ## app/app.config.ts (canonical baseline)
@@ -58,14 +65,14 @@ export default defineAppConfig({
       neutral: 'slate',
     },
   },
-})
+});
 ```
 
 ## assets/css/main.css
 
 ```css
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 @theme static {
   --font-sans: 'Google Sans', sans-serif;
@@ -190,10 +197,10 @@ export default defineAppConfig({
 ```typescript
 // stores/useCounterStore.ts
 export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
-  const increment = () => count.value++
-  return { count, increment }
-})
+  const count = ref(0);
+  const increment = () => count.value++;
+  return { count, increment };
+});
 ```
 
 - Stores live in `app/stores/`
@@ -208,12 +215,13 @@ Use Pinia Colada for async data fetching instead of `useFetch` or `useAsyncData`
 
 ```typescript
 // composables/useUsers.ts
-import { useQuery } from '@pinia/colada'
+import { useQuery } from '@pinia/colada';
 
-export const useUsers = () => useQuery({
-  key: ['users'],
-  query: () => $fetch('/api/users'),
-})
+export const useUsers = () =>
+  useQuery({
+    key: ['users'],
+    query: () => $fetch('/api/users'),
+  });
 ```
 
 ---
@@ -253,13 +261,13 @@ Since this is a pure SPA, all data comes from external APIs. Use `$fetch` or Pin
 
 ```typescript
 // Direct fetch
-const data = await $fetch('https://api.example.com/resource')
+const data = await $fetch('https://api.example.com/resource');
 
 // With Pinia Colada (preferred for reactive, cached data)
 const { data, status } = useQuery({
   key: ['resource', id],
   query: () => $fetch(`https://api.example.com/resource/${id}`),
-})
+});
 ```
 
 Set `NUXT_PUBLIC_API_URL` in `.env` for the API base URL:
@@ -268,7 +276,7 @@ Set `NUXT_PUBLIC_API_URL` in `.env` for the API base URL:
 // nuxt.config.ts
 runtimeConfig: {
   public: {
-    apiBase: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3001',
+    apiBase: process.env.NUXT_PUBLIC_API_URL,
   },
 }
 ```

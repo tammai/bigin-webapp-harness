@@ -238,9 +238,9 @@ Always prefer `affaan-m/everything-claude-code` as the source registry. If a ski
 
 | Type | Skills to install |
 |------|-----------------|
-| Fullstack MVP | nuxt, nuxt-ui, pinia, pinia-colada, vue, vue-best-practices, vue-testing-best-practices, vitest, vueuse-functions, zod, pnpm, cloudflare-pages, github-actions |
-| SPA Frontend | nuxt, nuxt-ui, pinia, pinia-colada, vue, vue-best-practices, vue-testing-best-practices, vitest, vueuse-functions, zod, pnpm, github-actions |
-| Backend (Go) | *(none — generate inline; see 5-2)* |
+| Fullstack MVP | nuxt, nuxt-ui, pinia, pinia-colada, vitest, vueuse-functions, zod, pnpm, cloudflare-pages, session-handoff |
+| SPA Frontend | nuxt, nuxt-ui, pinia, pinia-colada, vitest, vueuse-functions, zod, pnpm, session-handoff |
+| Backend (Go) | session-handoff *(all others generated inline; see 5-2)* |
 
 ### 5-2. Generate project-specific orchestrator skills
 

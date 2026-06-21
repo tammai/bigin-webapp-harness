@@ -7,21 +7,24 @@ description: "Session handoff and state persistence. Use when: user says 'save s
 
 Saves and loads session state between Claude Code sessions, useful when approaching usage limits and needing to continue work later.
 
-*Lưu trạng thái phiên giữa các phiên Claude Code, hữu ích khi sắp đạt giới hạn sử dụng.*
+_Lưu trạng thái phiên giữa các phiên Claude Code, hữu ích khi sắp đạt giới hạn sử dụng._
 
 ---
 
 ## When This Triggers
 
 **Save session:**
+
 - User says: "save session", "/save-session", "nearing limit", "running out of tokens"
 - Or explicitly: "pause here", "save my work", "handoff"
 
 **Load session:**
+
 - Automatically at session start if SESSION.md exists with status: in-progress
 - User says: "load session", "resume session", "continue where we left off"
 
 **Complete session:**
+
 - User says: "complete session", "/complete-session", "session done"
 - Or after all tasks are completed and working tree is clean
 
@@ -30,12 +33,7 @@ Saves and loads session state between Claude Code sessions, useful when approach
 ## Session File Location
 
 ```
-~/.claude/projects/<project-id>/memory/SESSION.md
-```
-
-For this plugin (bigin-webapp-harness):
-```
-~/.claude/projects/-Users-tammai-bigin-bigin-skills/memory/SESSION.md
+.claude/memory/SESSION.md
 ```
 
 ---
@@ -51,6 +49,7 @@ When user triggers save:
    - Note current branch, recent commits
 
 2. **Write SESSION.md:**
+
    ```markdown
    ---
    session-id: <uuid>
@@ -66,24 +65,29 @@ When user triggers save:
    **Recent commits:** <latest commit hash: message>
 
    ## What We Were Working On
+
    <High-level summary of current task>
 
    ## Current State
 
    ### Tasks
+
    <Capture from TaskList with checkboxes and status>
    - [ ] Task 1 (in_progress)
    - [x] Task 2 (completed)
    - [ ] Task 3 (pending)
 
    ### Decisions Made
+
    <List key decisions with rationale>
    - **Decision 1:** <what and why>
    - **Decision 2:** <what and why>
 
    ### Uncommitted Changes
    ```
+
    <git diff --stat output>
+
    ```
 
    ### Next Steps
@@ -109,10 +113,11 @@ When user triggers save:
 **Triggered:** At session start (if SESSION.md exists with status: in-progress)
 
 1. **Check for SESSION.md:**
-   - Read `~/.claude/projects/<project-id>/memory/SESSION.md`
+   - Read `.claude/memory/SESSION.md`
    - If missing or status: complete, skip load
 
 2. **Prompt user:**
+
    ```
    Found previous session from <date>:
    <summary from SESSION.md>
@@ -145,6 +150,7 @@ When user triggers complete:
    - Check TaskList — should have no in_progress tasks
 
 2. **Archive session:**
+
    ```bash
    mv SESSION.md SESSION.archive.<timestamp>.md
    ```
@@ -157,6 +163,7 @@ When user triggers complete:
    ```
 
 **If not complete:**
+
 - Warn user: "Session has uncommitted changes or in-progress tasks. Complete those first, or use /save-session to pause."
 
 ---
@@ -175,6 +182,7 @@ status: in-progress | complete
 ```
 
 **Content sections:**
+
 - What We Were Working On — high-level summary
 - Current State — tasks, decisions, uncommitted changes
 - Next Steps — what to do when resuming
@@ -191,12 +199,14 @@ SESSION.md includes harness-specific state:
 
 ```markdown
 ## Current Harness State
+
 Phase: 3 (Stack Verification)
 Project Type: Fullstack MVP
 Selected Agents: architect, frontend-dev, qa
 Optional Services: D1 enabled, auth disabled
 
 ## Progress
+
 - [x] Phase 0: Repo detection (empty)
 - [x] Phase 1: Type selection
 - [x] Phase 2: Agent role selection
@@ -208,6 +218,7 @@ Optional Services: D1 enabled, auth disabled
 ```
 
 **On resume:**
+
 - Harness skill reads SESSION.md
 - Restores phase progress
 - Continues from the next uncompleted phase
@@ -216,12 +227,12 @@ Optional Services: D1 enabled, auth disabled
 
 ## Commands Reference
 
-| Command | Trigger | Action |
-|---------|---------|--------|
-| `/save-session` | User says "save session", "/save-session", "nearing limit" | Write current state to SESSION.md |
-| `/load-session` | User says "load session", "resume session" | Read and display SESSION.md |
-| `/complete-session` | User says "complete session", "session done" | Archive SESSION.md, mark complete |
-| Auto-load | Session start if SESSION.md exists | Prompt user: resume or fresh? |
+| Command             | Trigger                                                    | Action                            |
+| ------------------- | ---------------------------------------------------------- | --------------------------------- |
+| `/save-session`     | User says "save session", "/save-session", "nearing limit" | Write current state to SESSION.md |
+| `/load-session`     | User says "load session", "resume session"                 | Read and display SESSION.md       |
+| `/complete-session` | User says "complete session", "session done"               | Archive SESSION.md, mark complete |
+| Auto-load           | Session start if SESSION.md exists                         | Prompt user: resume or fresh?     |
 
 ---
 

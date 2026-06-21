@@ -93,7 +93,7 @@ When approaching usage limits or needing to pause work, use the session-handoff 
 
 **Auto-load at session start:**
 
-- Check for `~/.claude/memory/SESSION.md`
+- Check for `.claude/memory/SESSION.md`
 - If found with `status: in-progress`, prompt: "Resume previous session or start fresh?"
 - Display saved context (tasks, decisions, uncommitted changes) on resume
 
@@ -106,7 +106,7 @@ When approaching usage limits or needing to pause work, use the session-handoff 
 **SESSION.md location:**
 
 ```
-~/.claude/projects/-Users/tammai-bigin-bigin-skills/memory/SESSION.md
+.claude/memory/SESSION.md
 ```
 
 **During harness execution:**

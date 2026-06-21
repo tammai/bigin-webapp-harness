@@ -12,9 +12,6 @@ nuxt
 nuxt-ui
 pinia
 pinia-colada
-vue
-vue-best-practices
-vue-testing-best-practices
 vitest
 vueuse-functions
 zod
@@ -22,11 +19,10 @@ pnpm
 cloudflare-pages
 drizzle               (optional — only when D1 is enabled)
 nuxt-auth-utils       (optional — only when auth is needed)
-github-actions
 session-handoff
 ```
 
-**Total: 16 skills** (14 base + drizzle optional + nuxt-auth-utils optional)
+**Total: 12 skills** (10 base + drizzle optional + nuxt-auth-utils optional)
 
 ---
 
@@ -37,19 +33,15 @@ nuxt
 nuxt-ui
 pinia
 pinia-colada
-vue
-vue-best-practices
-vue-testing-best-practices
 vitest
 vueuse-functions
 zod
 pnpm
 nuxt-auth-utils       (optional — only when auth is needed)
-github-actions
 session-handoff
 ```
 
-**Total: 14 skills** (12 base + nuxt-auth-utils optional)
+**Total: 10 skills** (9 base + nuxt-auth-utils optional)
 
 ---
 

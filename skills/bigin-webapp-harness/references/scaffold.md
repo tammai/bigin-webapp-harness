@@ -1,15 +1,17 @@
 # Project Scaffold Templates
+
 # Mẫu khởi tạo dự án
 
 Scaffold uses the official `nuxi init` command for Nuxt projects (Types 1 & 2), then adds packages and writes config files on top. Go projects (Type 3) are still file-written verbatim.
 
-*Nuxt project scaffold dùng lệnh `nuxi init` chính thức, sau đó thêm packages và ghi config. Go project vẫn ghi file trực tiếp.*
+_Nuxt project scaffold dùng lệnh `nuxi init` chính thức, sau đó thêm packages và ghi config. Go project vẫn ghi file trực tiếp._
 
 ---
 
 ## Detection — Is the repo empty?
 
 Check for any of these files. If **none** exist, the repo is empty and needs scaffolding:
+
 - `package.json`
 - `nuxt.config.ts`
 - `go.mod`
@@ -19,6 +21,7 @@ If any exist, skip scaffold entirely — assume the project is already bootstrap
 ---
 
 ## Customization Prompt (Nuxt types only)
+
 ## Hỏi tùy chỉnh (chỉ cho Nuxt)
 
 Ask the user these questions **before running any commands**:
@@ -57,6 +60,7 @@ This creates the base Nuxt + Nuxt UI project without running `pnpm install`.
 Merge these fields into the generated `package.json` (do not replace the whole file — add/overwrite only these keys):
 
 **scripts:**
+
 ```json
 {
   "build": "NUXT_DEVTOOLS_ENABLED=false nuxt build",
@@ -78,6 +82,7 @@ Merge these fields into the generated `package.json` (do not replace the whole f
 > **Substitute `{app-name}` in `db:migrate`** before writing — use the actual app name collected in the customization prompt (e.g. `wrangler d1 migrations apply my-project-db --local`).
 
 **dependencies to add** (merge into existing `dependencies`):
+
 ```json
 {
   "@pinia/nuxt": "latest",
@@ -92,6 +97,7 @@ Merge these fields into the generated `package.json` (do not replace the whole f
 > If auth is enabled, also add `"nuxt-auth-utils": "latest"`.
 
 **devDependencies to add** (merge into existing `devDependencies`):
+
 ```json
 {
   "@nuxt/eslint": "latest",
@@ -112,6 +118,7 @@ Merge these fields into the generated `package.json` (do not replace the whole f
 > If D1 is NOT enabled, omit `drizzle-kit`.
 
 **top-level fields to add:**
+
 ```json
 {
   "simple-git-hooks": {
@@ -128,6 +135,7 @@ Merge these fields into the generated `package.json` (do not replace the whole f
 Write or overwrite each file below. If the file already exists from nuxi init, replace it.
 
 #### `nuxt.config.ts`
+
 ```typescript
 export default defineNuxtConfig({
   modules: [
@@ -160,12 +168,13 @@ export default defineNuxtConfig({
       },
     },
   },
-})
+});
 ```
 
 > Uncomment `nuxt-auth-utils` if auth is enabled.
 
 #### `app/app.config.ts`
+
 ```typescript
 export default defineAppConfig({
   ui: {
@@ -179,13 +188,14 @@ export default defineAppConfig({
       },
     },
   },
-})
+});
 ```
 
 #### `app/assets/css/main.css`
+
 ```css
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 @theme static {
   --font-sans: '{font}', sans-serif;
@@ -255,20 +265,21 @@ export default defineAppConfig({
 > `{font}` is the font family from the customization prompt (e.g. `Google Sans`). Google Sans is expected to be available via OS/CDN — no `@import` needed; `@theme static` registers it as the default sans-serif through Tailwind v4.
 
 #### `eslint.config.mjs`
+
 ```javascript
 // @ts-check
-import withNuxt from './.nuxt/eslint.config.mjs'
+import withNuxt from './.nuxt/eslint.config.mjs';
 
-export default withNuxt(
-  // Add custom rules here
-)
+export default withNuxt();
+// Add custom rules here
 ```
 
 #### `app/app.vue`
+
 ```vue
 <script setup>
-useHead({ htmlAttrs: { lang: 'en' } })
-useSeoMeta({ title: '{app-name}' })
+useHead({ htmlAttrs: { lang: 'en' } });
+useSeoMeta({ title: '{app-name}' });
 </script>
 
 <template>
@@ -281,6 +292,7 @@ useSeoMeta({ title: '{app-name}' })
 ```
 
 #### `app/layouts/default.vue`
+
 ```vue
 <template>
   <div class="min-h-screen">
@@ -290,19 +302,19 @@ useSeoMeta({ title: '{app-name}' })
 ```
 
 #### `app/pages/index.vue`
+
 ```vue
 <template>
   <UContainer class="py-16">
-    <h1 class="heading-1 text-highlighted">
-      {app-name}
-    </h1>
+    <h1 class="heading-1 text-highlighted">{app-name}</h1>
   </UContainer>
 </template>
 ```
 
 #### `vitest.config.ts`
+
 ```typescript
-import { defineVitestConfig } from '@nuxt/test-utils/config'
+import { defineVitestConfig } from '@nuxt/test-utils/config';
 
 export default defineVitestConfig({
   test: {
@@ -314,10 +326,11 @@ export default defineVitestConfig({
     },
     include: ['tests/unit/**/*.test.ts'],
   },
-})
+});
 ```
 
 #### `.vscode/settings.json`
+
 ```json
 {
   "prettier.enable": false,
@@ -330,6 +343,7 @@ export default defineVitestConfig({
 ```
 
 #### `.editorconfig`
+
 ```ini
 root = true
 
@@ -346,6 +360,7 @@ trim_trailing_whitespace = false
 ```
 
 #### `wrangler.toml`
+
 ```toml
 name = "{app-name}"
 compatibility_date = "2025-01-15"
@@ -372,6 +387,7 @@ pages_build_output_dir = ".output/public"
 ```
 
 #### `.env.example`
+
 ```
 # Cloudflare bindings are configured in wrangler.toml
 # Local secrets:
@@ -379,6 +395,7 @@ pages_build_output_dir = ".output/public"
 ```
 
 #### `.claude/settings.json`
+
 ```json
 {
   "hooks": {
@@ -400,6 +417,7 @@ pages_build_output_dir = ".output/public"
 ### Step 4 — Create directories
 
 Create these empty directories with a `.gitkeep` placeholder:
+
 ```
 app/components/
 app/composables/
@@ -439,6 +457,7 @@ Now generating your agent team...
 Same flow as Type 1 with these differences:
 
 ### Step 1 — Same nuxi init command
+
 ```bash
 pnpm create nuxt@latest . --template ui --packageManager pnpm --no-gitInit --no-install
 ```
@@ -446,6 +465,7 @@ pnpm create nuxt@latest . --template ui --packageManager pnpm --no-gitInit --no-
 ### Step 2 — package.json differences
 
 **scripts** — omit all `cf:types`, `db:*` entries. Keep:
+
 ```json
 {
   "build": "NUXT_DEVTOOLS_ENABLED=false nuxt build",
@@ -460,6 +480,7 @@ pnpm create nuxt@latest . --template ui --packageManager pnpm --no-gitInit --no-
 ```
 
 **dependencies** — omit `drizzle-orm`; no Cloudflare packages:
+
 ```json
 {
   "@pinia/nuxt": "latest",
@@ -472,6 +493,7 @@ pnpm create nuxt@latest . --template ui --packageManager pnpm --no-gitInit --no-
 > Add `"nuxt-auth-utils": "latest"` if auth enabled.
 
 **devDependencies** — omit `@cloudflare/workers-types`, `wrangler`, `nitro-cloudflare-dev`, `drizzle-kit`:
+
 ```json
 {
   "@nuxt/eslint": "latest",
@@ -488,6 +510,7 @@ pnpm create nuxt@latest . --template ui --packageManager pnpm --no-gitInit --no-
 ### Step 3 — Config file differences
 
 #### `nuxt.config.ts` (SPA — no nitro preset)
+
 ```typescript
 export default defineNuxtConfig({
   modules: [
@@ -509,7 +532,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3001',
+      apiBase: process.env.NUXT_PUBLIC_API_URL,
     },
   },
 
@@ -521,17 +544,19 @@ export default defineNuxtConfig({
       },
     },
   },
-})
+});
 ```
 
 #### `.env.example` (SPA)
+
 ```
-NUXT_PUBLIC_API_URL=http://localhost:3001
+NUXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
 All other config files (`app.config.ts`, `main.css`, `app.vue`, `layouts/default.vue`, `pages/index.vue`, `vitest.config.ts`, `.vscode/settings.json`, `.editorconfig`, `.claude/settings.json`) are **identical to Type 1** — skip `wrangler.toml`.
 
 ### Step 4 — Directories (no server/ or migrations/)
+
 ```
 app/components/
 app/composables/
@@ -541,11 +566,13 @@ public/
 ```
 
 ### Step 5 — pnpm install
+
 ```bash
 pnpm install
 ```
 
 ### Step 6 — Announce
+
 ```
 ✅ SPA Frontend scaffolded.
 
@@ -562,6 +589,7 @@ Now generating your agent team...
 ### Files to create
 
 #### `go.mod` (replace `your-module-name` with actual name)
+
 ```
 module your-module-name
 
@@ -569,6 +597,7 @@ go 1.23
 ```
 
 #### `cmd/server/main.go`
+
 ```go
 package main
 
@@ -597,6 +626,7 @@ func main() {
 ```
 
 #### `Makefile`
+
 ```makefile
 .PHONY: run build test tidy
 
@@ -614,6 +644,7 @@ tidy:
 ```
 
 #### `.gitignore`
+
 ```
 bin/
 *.env
@@ -622,11 +653,13 @@ bin/
 ```
 
 #### `.env.example`
+
 ```
 PORT=8080
 ```
 
 ### Directories to create (empty, add `.gitkeep`)
+
 ```
 cmd/server/
 internal/
@@ -637,6 +670,7 @@ internal/
 ```
 
 ### After scaffold — tell the user:
+
 ```
 ✅ Go Backend scaffolded.
 

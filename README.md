@@ -9,11 +9,11 @@ A meta-skill that turns a project description into a specialized agent team and 
 
 ## Project Types / Loại dự án
 
-| Type              | Stack                | Description                                                                               |
-| ----------------- | -------------------- | ----------------------------------------------------------------------------------------- |
-| **Fullstack MVP** | Nuxt v4 + Cloudflare | Nuxt UI, Tailwind, Pinia, VueUse, Nitro (cloudflare-pages), D1/R2/KV (optional), Wrangler |
-| **SPA Frontend**  | Nuxt v4, SSR false   | Nuxt UI, Tailwind, Pinia, Pinia Colada, VueUse, client-side only                          |
-| **Backend**       | Go                   | chi router, standard project layout, testify                                              |
+| Type              | Stack                | Description                                                                                             |
+| ----------------- | -------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Fullstack MVP** | Nuxt v4 + Cloudflare | Nuxt UI, Tailwind, Pinia, Pinia Colada, VueUse, Nitro (cloudflare-pages), D1/R2/KV (optional), Wrangler |
+| **SPA Frontend**  | Nuxt v4, SSR false   | Nuxt UI, Tailwind, Pinia, Pinia Colada, VueUse, client-side only                                        |
+| **Backend**       | Go                   | chi router, standard project layout, testify                                                            |
 
 **All Nuxt types share:** Google Sans font, primary blue / neutral slate theme, `ssr: false`.
 
@@ -101,7 +101,8 @@ cp -r skills/bigin-webapp-harness ~/.claude/skills/bigin-webapp-harness
 ```
 bigin-webapp-harness/
 ├── .claude-plugin/
-│   └── plugin.json                        ← 1 skill registered globally
+│   ├── plugin.json                        ← plugin metadata (name, version, author)
+│   └── marketplace.json                   ← marketplace registry entry
 ├── skills/
 │   ├── bigin-webapp-harness/              ← Harness factory (main skill, globally registered)
 │   │   ├── SKILL.md                       ← 8-phase workflow
@@ -111,47 +112,30 @@ bigin-webapp-harness/
 │   │       ├── backend-go.md              ← Go backend spec
 │   │       ├── agent-roles.md             ← Role catalog + agent file templates
 │   │       ├── orchestrator-template.md   ← Sub-agent orchestrator templates A/B/C
-│   │       ├── scaffold.md                ← Project file templates
+│   │       ├── scaffold.md                ← Project scaffold templates
 │   │       └── skill-manifest.md          ← Type → skills mapping
-│   ├── nuxt/                              ← Nuxt v4 deep reference
-│   ├── nuxt-ui/                           ← Nuxt UI component library
-│   ├── pinia/                             ← Pinia state management
-│   ├── pinia-colada/                      ← Pinia Colada async data
-│   ├── vue/                               ← Vue 3 core patterns
-│   ├── vue-best-practices/                ← Vue best practices
-│   ├── vue-testing-best-practices/        ← Vue testing
-│   ├── vitest/                            ← Unit testing with Vitest
-│   ├── vueuse-functions/                  ← VueUse function reference
-│   ├── zod/                               ← Schema validation + type inference
-│   ├── pnpm/                              ← pnpm package manager conventions
-│   ├── cloudflare-pages/                  ← Cloudflare Pages deployment
-│   ├── drizzle/                           ← Drizzle ORM + D1 (SQLite)
-│   ├── nuxt-auth-utils/                   ← Auth: sessions, OAuth, passwords, WebAuthn
-│   └── github-actions/                    ← GitHub Actions CI/CD workflows
+│   └── session-handoff/                   ← Session state persistence skill
+│       └── SKILL.md
 └── README.md
 ```
 
-**Library skills are installed into projects on demand during Phase 5 — not loaded globally.**
+**Library skills (nuxt, pinia, etc.) are fetched from `affaan-m/everything-claude-code` and installed into target projects on demand during Phase 5 — they are not part of this plugin.**
 
-## Bundled Skills
+## Skills Installed at Harness-Time
 
-| Skill                        | Purpose                                              | Project types          |
-| ---------------------------- | ---------------------------------------------------- | ---------------------- |
-| `nuxt`                       | Nuxt v4 core config, routing, data fetching          | Fullstack MVP, SPA     |
-| `nuxt-ui`                    | Component library, design system, forms, layouts     | Fullstack MVP, SPA     |
-| `pinia`                      | Stores, composables, SSR patterns, testing           | Fullstack MVP, SPA     |
-| `pinia-colada`               | Async queries, mutations, cache, patterns            | Fullstack MVP, SPA     |
-| `vue`                        | Script setup, new APIs, advanced patterns            | Fullstack MVP, SPA     |
-| `vue-best-practices`         | Component design, performance, accessibility         | Fullstack MVP, SPA     |
-| `vue-testing-best-practices` | Unit tests, component tests, E2E                     | Fullstack MVP, SPA     |
-| `vitest`                     | Unit/component test setup, patterns, coverage        | Fullstack MVP, SPA     |
-| `vueuse-functions`           | Per-function reference for entire VueUse library     | Fullstack MVP, SPA     |
-| `zod`                        | Schema validation, type inference, form + API guards | Fullstack MVP, SPA     |
-| `pnpm`                       | Package manager conventions, lockfile, CI setup      | All                    |
-| `cloudflare-pages`           | Wrangler config, D1/R2/KV bindings, env vars, deploy | Fullstack MVP          |
-| `drizzle`                    | Drizzle ORM schema, migrations, queries for D1       | Fullstack MVP (D1 opt) |
+| Skill                        | Purpose                                              | Project types            |
+| ---------------------------- | ---------------------------------------------------- | ------------------------ |
+| `nuxt`                       | Nuxt v4 core config, routing, data fetching          | Fullstack MVP, SPA       |
+| `nuxt-ui`                    | Component library, design system, forms, layouts     | Fullstack MVP, SPA       |
+| `pinia`                      | Stores, composables, SSR patterns, testing           | Fullstack MVP, SPA       |
+| `pinia-colada`               | Async queries, mutations, cache, patterns            | Fullstack MVP, SPA       |
+| `vitest`                     | Unit/component test setup, patterns, coverage        | Fullstack MVP, SPA       |
+| `vueuse-functions`           | Per-function reference for entire VueUse library     | Fullstack MVP, SPA       |
+| `zod`                        | Schema validation, type inference, form + API guards | Fullstack MVP, SPA       |
+| `pnpm`                       | Package manager conventions, lockfile, CI setup      | All                      |
+| `cloudflare-pages`           | Wrangler config, D1/R2/KV bindings, env vars, deploy | Fullstack MVP            |
+| `drizzle`                    | Drizzle ORM schema, migrations, queries for D1       | Fullstack MVP (D1 opt)   |
 | `nuxt-auth-utils`            | Sessions, OAuth, password hashing, WebAuthn          | Fullstack MVP, SPA (opt) |
-| `github-actions`             | CI (typecheck + build) and deploy workflows          | Fullstack MVP, SPA     |
 
 ---
 
