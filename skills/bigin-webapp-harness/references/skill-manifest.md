@@ -25,7 +25,7 @@ nuxt-auth-utils       (optional — only when auth is needed)
 github-actions
 ```
 
-**Total: 15 skills** (12 base + drizzle optional + nuxt-auth-utils optional + github-actions)
+**Total: 15 skills** (13 base + drizzle optional + nuxt-auth-utils optional)
 
 ---
 

@@ -30,8 +30,7 @@ Before asking anything, check if the repo is empty.
 ```
 If empty repo detected:
   → Tell the user: "This looks like an empty repo. I'll scaffold the project
-    structure for you after you choose a type. No packages will be installed —
-    run pnpm install yourself when ready."
+    structure for you after you choose a type. Packages will be installed automatically."
   → Set scaffold_needed = true
   → Continue to Phase 1 (type selection happens first, scaffold happens after)
 
