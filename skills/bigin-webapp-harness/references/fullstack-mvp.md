@@ -62,7 +62,7 @@ export default defineNuxtConfig({
 })
 ```
 
-## app.config.ts (canonical baseline)
+## app/app.config.ts (canonical baseline)
 
 ```typescript
 export default defineAppConfig({
@@ -302,6 +302,7 @@ wrangler pages project create your-app-name
 ```
 project/
 ├── app/
+│   ├── app.config.ts
 │   ├── components/
 │   ├── composables/
 │   ├── layouts/
@@ -318,7 +319,6 @@ project/
 │       └── migrations/
 ├── public/
 ├── nuxt.config.ts
-├── app.config.ts
 ├── wrangler.toml
 └── package.json
 ```

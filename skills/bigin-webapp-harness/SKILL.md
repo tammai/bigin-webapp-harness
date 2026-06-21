@@ -119,7 +119,7 @@ If `scaffold_needed = true`, execute scaffold now using `references/scaffold.md`
   ```
   📁 Scaffolded:
     nuxt.config.ts
-    app.config.ts
+    app/app.config.ts
     package.json
     .npmrc
     .gitignore
@@ -184,35 +184,29 @@ For QA agents, add:
 
 ## Phase 5: Skill Install / Cài đặt skills
 
-Skills are **not generated from scratch** — they are copied from the plugin's bundled skill library into the project. This ensures consistent, high-quality reference material without relying on inline generation.
+Skills are **not bundled** in this plugin — they are discovered and installed at harness-time via the `find-skills` skill. This keeps the plugin lean and skills current from their authoritative sources.
 
-### 5-1. Locate the plugin directory
+### 5-1. Install library skills via find-skills
 
-The harness SKILL.md is at `{plugin_dir}/skills/bigin-webapp-harness/SKILL.md`.  
-The skill library is at `{plugin_dir}/skills/`.  
-Go two levels up from this file to find `{plugin_dir}`.
-
-### 5-2. Copy type-relevant skills
-
-Read `references/skill-manifest.md` for the exact list per type. Copy each listed skill directory recursively into the project:
+Read `references/skill-manifest.md` for the skill list per project type. For each skill, invoke:
 
 ```
-{plugin_dir}/skills/{name}/  →  {project}/.claude/skills/{name}/
+Skill('find-skills', '{skill-name} from affaan-m/everything-claude-code')
 ```
 
-Use file copy tools or bash `cp -r`. Never overwrite an existing `.claude/skills/{name}/` — skip and notify.
+Always prefer `affaan-m/everything-claude-code` as the source registry. If a skill is not found there, fall back to other sources. Call `find-skills` once per skill, sequentially. If `find-skills` reports the skill is already installed, skip it. If it cannot find a skill, note it in the setup summary and continue — do not abort.
 
 **Skills per type (summary):**
 
-| Type | Skills installed |
+| Type | Skills to install |
 |------|-----------------|
 | Fullstack MVP | nuxt, nuxt-ui, pinia, pinia-colada, vue, vue-best-practices, vue-testing-best-practices, vitest, vueuse-functions, zod, pnpm, cloudflare-pages |
 | SPA Frontend | nuxt, nuxt-ui, pinia, pinia-colada, vue, vue-best-practices, vue-testing-best-practices, vitest, vueuse-functions, zod, pnpm |
-| Backend (Go) | *(none — generate inline; see 5-3)* |
+| Backend (Go) | *(none — generate inline; see 5-2)* |
 
-### 5-3. Generate project-specific orchestrator skills
+### 5-2. Generate project-specific orchestrator skills
 
-After copying the library skills, generate these thin project-specific skills at `project/.claude/skills/`:
+After installing the library skills, generate these thin project-specific skills at `project/.claude/skills/`:
 
 **All types:**
 - `webapp-harness/` — orchestrator (from `references/orchestrator-template.md`)
@@ -226,7 +220,7 @@ After copying the library skills, generate these thin project-specific skills at
 **Go Backend (generate all inline, no library):**
 - `setup/`, `api-development/`, `testing/`
 
-### 5-4. Skill authoring rules (for generated skills only)
+### 5-3. Skill authoring rules (for generated skills only)
 
 | Principle | Rule |
 |-----------|------|
@@ -235,7 +229,7 @@ After copying the library skills, generate these thin project-specific skills at
 | **Commands over prose** | Show exact CLI commands for setup/deploy skills |
 | **Bilingual headers** | Use `## Section / Phần` format |
 
-### 5-5. Progressive Disclosure
+### 5-4. Progressive Disclosure
 
 | Tier | When Loaded | Size |
 |------|------------|------|
@@ -302,7 +296,7 @@ Bad near-miss: "Write a poem" — obviously irrelevant, no test value.
 ## Output Checklist / Danh sách kiểm tra
 
 - [ ] `.claude/agents/` — all selected agent definition files
-- [ ] `.claude/skills/` — library skills copied from plugin (per skill-manifest.md) + generated orchestrator/setup skills
+- [ ] `.claude/skills/` — library skills installed via find-skills (per skill-manifest.md) + generated orchestrator/setup skills
 - [ ] `.claude/skills/webapp-harness/SKILL.md` — orchestrator
 - [ ] `architect`: `model: opus` — all others: `model: sonnet`
 - [ ] No `.claude/commands/` entries

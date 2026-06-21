@@ -100,7 +100,7 @@ export default defineNuxtConfig({
 })
 ```
 
-#### `app.config.ts`
+#### `app/app.config.ts`
 ```typescript
 export default defineAppConfig({
   ui: {
@@ -395,7 +395,7 @@ export default defineNuxtConfig({
 })
 ```
 
-#### `app.config.ts`
+#### `app/app.config.ts`
 ```typescript
 export default defineAppConfig({
   ui: {

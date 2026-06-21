@@ -48,7 +48,7 @@ export default defineNuxtConfig({
 })
 ```
 
-## app.config.ts (canonical baseline)
+## app/app.config.ts (canonical baseline)
 
 ```typescript
 export default defineAppConfig({
@@ -231,6 +231,7 @@ export const useUsers = () => useQuery({
 ```
 project/
 ├── app/
+│   ├── app.config.ts
 │   ├── components/
 │   ├── composables/
 │   ├── layouts/
@@ -241,7 +242,6 @@ project/
 │           └── main.css
 ├── public/
 ├── nuxt.config.ts
-├── app.config.ts
 └── package.json
 ```
 

@@ -16,21 +16,6 @@ skills/
   bigin-webapp-harness/   ← the main harness factory skill (globally registered)
     SKILL.md              ← 8-phase workflow (the core logic)
     references/           ← spec files loaded on demand during the workflow
-  nuxt/                   ← bundled library skills (copied into target projects)
-  nuxt-ui/
-  pinia/
-  pinia-colada/
-  vue/
-  vue-best-practices/
-  vue-testing-best-practices/
-  vitest/
-  vueuse-functions/
-  pnpm/
-  cloudflare-pages/
-  drizzle/
-  nuxt-auth-utils/
-  zod/
-  github-actions/
 ```
 
 ## How the harness skill works
@@ -45,7 +30,7 @@ skills/
 | 3 | Confirm stack + optional services (D1, R2, KV, auth) |
 | 3.5 | Scaffold empty repo from `references/scaffold.md` (if needed) |
 | 4 | Generate `.claude/agents/{role}.md` files in the target project |
-| 5 | Copy bundled skills from this plugin's `skills/` into target project's `.claude/skills/` |
+| 5 | Install library skills into target project via `find-skills`; generate project-specific skills inline |
 | 6 | Generate orchestrator skill at target `.claude/skills/webapp-harness/SKILL.md` |
 | 7 | Validate structure, trigger tests, dry-run |
 
@@ -53,7 +38,7 @@ skills/
 
 - `references/agent-roles.md` — full role catalog + agent file templates per project type
 - `references/scaffold.md` — exact files to create for each project type when scaffolding
-- `references/skill-manifest.md` — which bundled skills get installed for each project type
+- `references/skill-manifest.md` — which skills get installed per project type (via find-skills)
 - `references/orchestrator-template.md` — sub-agent orchestrator templates (A/B/C variants)
 - `references/fullstack-mvp.md`, `references/spa-frontend.md`, `references/backend-go.md` — canonical stack specs
 
@@ -69,9 +54,9 @@ skills/
 - QA agents must use `agentType: general-purpose` (not `Explore` — Explore is read-only)
 
 **Skill install rules (Phase 5):**
-- Skills are **copied**, never generated — always copy from `skills/{name}/` into target `.claude/skills/{name}/`
-- Never overwrite an existing skill directory in the target project
-- Go Backend projects get no bundled skills — they are generated inline from the `backend-go.md` spec
+- Skills are **found and installed** via `Skill('find-skills', '{name}')` — never copied from a bundle
+- If `find-skills` reports a skill is already installed, skip it silently
+- Go Backend projects get no library skills — all skills are generated inline from the `backend-go.md` spec
 
 ## Versioning
 
