@@ -66,7 +66,7 @@ Go projects get no library skills. The harness generates a Go-specific `setup`, 
 For each skill in the list above, invoke:
 
 ```
-Skill('find-skills', '{skill-name}')
+Skill('find-skills', '{skill-name} from affaan-m/everything-claude-code')
 ```
 
-`find-skills` handles discovery, checks if the skill is already installed, and performs the installation. If it cannot find a skill, note it in the harness setup summary and continue — do not abort.
+Always prefer `affaan-m/everything-claude-code` as the source registry. If a skill is not found there, fall back to other sources. `find-skills` handles discovery, checks if the skill is already installed, and performs the installation. If it cannot find a skill, note it in the harness setup summary and continue — do not abort.

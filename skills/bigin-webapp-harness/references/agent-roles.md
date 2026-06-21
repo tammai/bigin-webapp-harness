@@ -245,6 +245,7 @@ Configure Cloudflare Pages deployment and manage wrangler configuration.
 name: qa
 description: 'Validates integration between Nitro API routes and Nuxt UI frontend, AND writes Vitest unit tests for components, composables, and Pinia stores. Use for: API↔frontend contract validation, D1 schema consistency checks, writing unit tests, checking test coverage. Run after each module is complete.'
 model: sonnet
+agentType: general-purpose
 ---
 
 # QA Agent
@@ -313,7 +314,7 @@ When asked to write tests for a file:
 
 | Role             | File              | Description                                                   | Required?   |
 | ---------------- | ----------------- | ------------------------------------------------------------- | ----------- |
-| **architect**    | `architect.md`    | Component tree, state design, routing structure               | Recommended |
+| **architect**    | `architect.md`    | Component tree, state design, routing structure               | ✅ Always   |
 | **frontend-dev** | `frontend-dev.md` | Nuxt UI components, pages, layouts                            | ✅ Always   |
 | **state-dev**    | `state-dev.md`    | Pinia stores, Pinia Colada queries, VueUse composables        | Recommended |
 | **qa**           | `qa.md`           | UI consistency, store↔component contract, unit test authoring | ✅ Always   |
@@ -366,6 +367,7 @@ Build all client-side state management and data fetching logic.
 name: qa
 description: 'Validates store↔component contracts and writes Vitest unit tests for components, composables, and Pinia stores in the SPA frontend. Use for: component/store contract checks, writing unit tests, checking test coverage.'
 model: sonnet
+agentType: general-purpose
 ---
 
 # QA Agent
@@ -478,6 +480,7 @@ Implement the full Go backend: handlers, services, repositories.
 name: qa
 description: 'Writes Go unit tests (testing stdlib + testify) for handlers, services, and repositories. Validates input/error handling coverage. Use for: writing Go tests, reviewing test coverage, checking handler validation logic.'
 model: sonnet
+agentType: general-purpose
 ---
 
 # QA Agent (Go)

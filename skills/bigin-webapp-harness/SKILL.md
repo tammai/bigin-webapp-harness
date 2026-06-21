@@ -112,26 +112,11 @@ Capture all choices. These become the ground truth for all agent and skill gener
 If `scaffold_needed = true`, execute scaffold now using `references/scaffold.md` for the confirmed project type.
 
 **Rules:**
-- Write all files listed in the scaffold reference for the chosen type
-- Never overwrite a file that already exists
-- Do NOT run `pnpm install`, `npm install`, `go mod tidy`, or any package manager command — write files only
-- After writing, print a summary:
-  ```
-  📁 Scaffolded:
-    nuxt.config.ts
-    app/app.config.ts
-    package.json
-    .npmrc
-    .gitignore
-    assets/css/main.css
-    wrangler.toml        ← fullstack only
-    app/app.vue
-    app/layouts/default.vue
-    app/pages/index.vue
-    [directories created]
-
-  Run `pnpm install` when ready. Now setting up your agent team...
-  ```
+- Follow `references/scaffold.md` exactly for the confirmed project type
+- **Nuxt types (1 & 2):** run `pnpm install` automatically at the end — project must be ready to develop immediately after scaffold
+- **Go type:** do NOT run any install command — write files only, user runs `go mod tidy` manually
+- Nuxi-generated files that scaffold.md Step 3 explicitly says to replace **must be overwritten** — the raw nuxi template config is incomplete (missing nitro preset, eslint stylistic, etc.)
+- After scaffold, print the "Announce" block from scaffold.md for the chosen type
 
 If `scaffold_needed = false`, skip this phase entirely.
 
@@ -200,8 +185,8 @@ Always prefer `affaan-m/everything-claude-code` as the source registry. If a ski
 
 | Type | Skills to install |
 |------|-----------------|
-| Fullstack MVP | nuxt, nuxt-ui, pinia, pinia-colada, vue, vue-best-practices, vue-testing-best-practices, vitest, vueuse-functions, zod, pnpm, cloudflare-pages |
-| SPA Frontend | nuxt, nuxt-ui, pinia, pinia-colada, vue, vue-best-practices, vue-testing-best-practices, vitest, vueuse-functions, zod, pnpm |
+| Fullstack MVP | nuxt, nuxt-ui, pinia, pinia-colada, vue, vue-best-practices, vue-testing-best-practices, vitest, vueuse-functions, zod, pnpm, cloudflare-pages, github-actions |
+| SPA Frontend | nuxt, nuxt-ui, pinia, pinia-colada, vue, vue-best-practices, vue-testing-best-practices, vitest, vueuse-functions, zod, pnpm, github-actions |
 | Backend (Go) | *(none — generate inline; see 5-2)* |
 
 ### 5-2. Generate project-specific orchestrator skills
