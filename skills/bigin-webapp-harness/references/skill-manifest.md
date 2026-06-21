@@ -23,9 +23,10 @@ cloudflare-pages
 drizzle               (optional — only when D1 is enabled)
 nuxt-auth-utils       (optional — only when auth is needed)
 github-actions
+session-handoff
 ```
 
-**Total: 15 skills** (13 base + drizzle optional + nuxt-auth-utils optional)
+**Total: 16 skills** (14 base + drizzle optional + nuxt-auth-utils optional)
 
 ---
 
@@ -45,19 +46,22 @@ zod
 pnpm
 nuxt-auth-utils       (optional — only when auth is needed)
 github-actions
+session-handoff
 ```
 
-**Total: 13 skills** (no cloudflare-pages/drizzle — SPA has no Cloudflare server binding needs; nuxt-auth-utils optional)
+**Total: 14 skills** (12 base + nuxt-auth-utils optional)
 
 ---
 
 ## Type 3: Backend (Go)
 
 ```
-(none)
+session-handoff
 ```
 
-Go projects get no library skills. The harness generates a Go-specific `setup`, `api-development`, and `testing` skill inline during Phase 5-2 from the `backend-go.md` spec.
+Go projects get no library skills from `find-skills`. The harness generates a Go-specific `setup`, `api-development`, `testing`, and `session-handoff` skill inline during Phase 5-2 from the `backend-go.md` spec.
+
+**Total: 1 skill** (session-handoff, generated inline)
 
 ---
 

@@ -21,6 +21,60 @@ Meta-skill that generates agent definitions (`.claude/agents/`) and skills (`.cl
 
 ---
 
+## Session Handoff / Chuyển tiếp phiên
+
+**When user triggers save session:**
+
+At any point during harness execution, if the user says "save session", "/save-session", "nearing limit", or similar:
+
+1. **Capture current harness state:**
+   - Current phase number and name
+   - Project type selected
+   - Agent roles selected
+   - Optional services enabled (D1, R2, KV, auth)
+   - Completed phases (checkbox list)
+   - Current phase progress
+
+2. **Write to SESSION.md:**
+   ```markdown
+   ## Current Harness State
+   Phase: <current-phase-number> (<phase-name>)
+   Project Type: <Fullstack MVP / SPA Frontend / Go Backend>
+   Selected Agents: <agent-list>
+   Optional Services: <D1/KV/R2/auth status>
+
+   ## Progress
+   - [x] Phase 0: Repo detection
+   - [x] Phase 1: Type selection
+   - [x] Phase 2: Agent role selection
+   - [x] Phase 3: Stack verification
+   - [ ] Phase 4: Agent generation (NEXT)
+   - [ ] Phase 5: Skill install
+   - [ ] Phase 6: Orchestrator generation
+   - [ ] Phase 7: Validation
+
+   ## Context Notes
+   <any decisions made, user preferences, issues encountered>
+   ```
+
+3. **Confirm save:**
+   ```
+   ✅ Harness state saved to SESSION.md
+   Resume: Next session will continue from Phase <next-phase>
+   ```
+
+**On session resume (when SESSION.md exists with harness state):**
+
+1. **Read SESSION.md** and display harness state
+2. **Restore context:**
+   - Display project type, selected agents, optional services
+   - Display progress checklist
+   - Display context notes
+3. **Continue from next uncompleted phase**
+4. **Ask user:** "Resume harness from Phase <X> or make changes?"
+
+---
+
 ## Phase 0: Repo Detection & Scaffold / Phát hiện và khởi tạo repo
 
 Before asking anything, check if the repo is empty.

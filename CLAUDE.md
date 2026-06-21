@@ -81,6 +81,29 @@ All `references/` paths in SKILL.md are relative to `skills/bigin-webapp-harness
 
 Version is in `.claude-plugin/plugin.json`. Bump it when publishing changes.
 
+## Session Handoff / Chuyển tiếp phiên
+
+When approaching usage limits or needing to pause work, use the session-handoff skill to save state.
+
+**Auto-load at session start:**
+- Check for `~/.claude/projects/-Users-tammai-bigin-bigin-skills/memory/SESSION.md`
+- If found with `status: in-progress`, prompt: "Resume previous session or start fresh?"
+- Display saved context (tasks, decisions, uncommitted changes) on resume
+
+**Manual triggers:**
+- `/save-session` — Save current state (tasks, decisions, uncommitted changes) to SESSION.md
+- `/load-session` — Load and display SESSION.md
+- `/complete-session` — Archive session as complete after work is done
+
+**SESSION.md location:**
+```
+~/.claude/projects/-Users/tammai-bigin-bigin-skills/memory/SESSION.md
+```
+
+**During harness execution:**
+- SESSION.md includes harness-specific state (current phase, project type, selected agents, progress)
+- On resume, harness continues from the next uncompleted phase
+
 ## Installation commands (for users of this plugin)
 
 ```
