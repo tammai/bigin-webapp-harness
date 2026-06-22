@@ -232,17 +232,44 @@ Read `references/skill-manifest.md` for the skill list per project type. For eac
 Skill('find-skills', '{skill-name} from affaan-m/everything-claude-code')
 ```
 
-Always prefer `affaan-m/everything-claude-code` as the source registry. If a skill is not found there, fall back to other sources. Call `find-skills` once per skill, sequentially. If `find-skills` reports the skill is already installed, skip it. If it cannot find a skill, note it in the setup summary and continue — do not abort.
+Always prefer `affaan-m/everything-claude-code` as the source registry; fall back to other sources only if a skill is not found there. Call `find-skills` once per skill, sequentially, collecting any that cannot be found; if `find-skills` reports a skill is already installed, skip it. **After the loop, if any skills were not found, do not silently skip them — resolve them all with a single batched prompt per 5-2** (do not block once per skill on the hot install path).
+
+> ⚠️ **Nuxt** — install **`nuxt4-patterns`** (see the table below), NEVER antfu's `nuxt` skill. Full rule + llms.txt fallback: see the Nuxt rule in CLAUDE.md.
 
 **Skills per type (summary):**
 
 | Type | Skills to install |
 |------|-----------------|
-| Fullstack MVP | nuxt, nuxt-ui, pinia, pinia-colada, vitest, vueuse-functions, zod, pnpm, cloudflare-pages, session-handoff |
-| SPA Frontend | nuxt, nuxt-ui, pinia, pinia-colada, vitest, vueuse-functions, zod, pnpm, session-handoff |
-| Backend (Go) | session-handoff *(all others generated inline; see 5-2)* |
+| Fullstack MVP | nuxt4-patterns, nuxt-ui, pinia, pinia-colada, vitest, vueuse, zod, pnpm, wrangler, session-handoff |
+| SPA Frontend | nuxt4-patterns, nuxt-ui, pinia, pinia-colada, vitest, vueuse, zod, pnpm, session-handoff |
+| Backend (Go) | session-handoff *(all others generated inline; see 5-3)* |
 
-### 5-2. Generate project-specific orchestrator skills
+### 5-2. Create-on-not-found fallback / Tự tạo skill khi không tìm thấy
+
+When the Phase 5-1 loop finishes with one or more skills `find-skills` could not locate in any source, **do not silently skip them.** Resolve them all with **one batched prompt** (not one prompt per skill — the install loop must not block once per missing skill). First suggest likely registry aliases you know (e.g. a missing `vueuse-functions` is almost certainly the `vueuse` skill), then for each still-missing skill offer:
+
+```
+Couldn't find these skills in any registry: {missing-list}
+For each, choose: (1) install under a different name you supply,
+(2) create a new project skill, (3) skip — note in summary and continue.
+```
+
+**Maintain a skip list** — record every skill the user skips and every name substitution. Phase 7 and the Output Checklist validate only the skills actually installed/created, never skipped ones.
+
+**Option 1 — Install under a different name:** re-run `find-skills` with the user-supplied name; on success, record the substitution (`{requested} → installed as {actual}`) so downstream references use the real name. Cap retries at **2 attempts** per skill; if still missing, fall through to option 2 or 3.
+
+**Option 2 — Create (default):**
+
+1. **Confirm scope** — if the skill's purpose is not obvious from its name + the chosen project type, ask one focused question: *"What should this skill cover, and which phrases should trigger it?"* Otherwise infer from the name (e.g. `pinia-colada-query` → a Pinia Colada query helper).
+2. **Author the skill** at `project/.claude/skills/{name}/SKILL.md` **per the authoring rules in 5-4** (do not re-derive them here).
+3. **Keep it project-local** — created skills live in the target project's `.claude/skills/`, never in this plugin or in `skill-manifest.md`. They are one-offs for this project only.
+4. Record in the setup summary: `✓ {name} — created locally (not in any registry)`.
+
+**Option 3 — Skip:** record `{name} — not found, skipped at user request` on the skip list and continue. Never abort the whole harness over missing skills.
+
+---
+
+### 5-3. Generate project-specific orchestrator skills
 
 After installing the library skills, generate these thin project-specific skills at `project/.claude/skills/`:
 
@@ -251,14 +278,14 @@ After installing the library skills, generate these thin project-specific skills
 - `setup/` — project-specific setup guide (scaffold commands, local dev, first-run checklist)
 
 **Fullstack MVP extras:**
-- `api-development/` — Nitro + Cloudflare binding conventions (thin, references copied nuxt skill)
+- `api-development/` — Nitro + Cloudflare binding conventions (thin, references the installed `nuxt4-patterns` skill)
 - `deployment/` — wrangler deploy commands, CI/CD steps
 - `database/` — D1 conventions (only if D1 enabled)
 
 **Go Backend (generate all inline, no library):**
 - `setup/`, `api-development/`, `testing/`
 
-### 5-3. Skill authoring rules (for generated skills only)
+### 5-4. Skill authoring rules (for generated skills only)
 
 | Principle | Rule |
 |-----------|------|
@@ -267,7 +294,7 @@ After installing the library skills, generate these thin project-specific skills
 | **Commands over prose** | Show exact CLI commands for setup/deploy skills |
 | **Bilingual headers** | Use `## Section / Phần` format |
 
-### 5-4. Progressive Disclosure
+### 5-5. Progressive Disclosure
 
 | Tier | When Loaded | Size |
 |------|------------|------|
@@ -311,13 +338,13 @@ The orchestrator wires all agents and skills into a single workflow. See `refere
 
 ### 7-1. Structure Check
 - [ ] All selected agent files exist at `.claude/agents/{name}.md`
-- [ ] All skill files exist at `.claude/skills/{name}/SKILL.md`
+- [ ] All installed/created skill files exist at `.claude/skills/{name}/SKILL.md` (excluding the 5-2 skip list)
 - [ ] Orchestrator skill exists
 - [ ] No files created in `.claude/commands/`
 - [ ] `architect` has `model: opus`; all other agents have `model: sonnet`
 
 ### 7-2. Skill Trigger Test
-For each skill, generate:
+For each **installed/created** skill (excluding the 5-2 skip list), generate:
 - 5 **should-trigger** queries (explicit + implicit phrasings, EN + VI)
 - 5 **should-NOT-trigger** queries (near-miss: similar topic, wrong skill)
 
@@ -334,13 +361,13 @@ Bad near-miss: "Write a poem" — obviously irrelevant, no test value.
 ## Output Checklist / Danh sách kiểm tra
 
 - [ ] `.claude/agents/` — all selected agent definition files
-- [ ] `.claude/skills/` — library skills installed via find-skills (per skill-manifest.md) + generated orchestrator/setup skills
+- [ ] `.claude/skills/` — library skills installed via find-skills (per skill-manifest.md) + skills created locally via 5-2 + generated orchestrator/setup skills (excludes 5-2 skips)
 - [ ] `.claude/skills/webapp-harness/SKILL.md` — orchestrator
 - [ ] `architect`: `model: opus` — all others: `model: sonnet`
 - [ ] No `.claude/commands/` entries
 - [ ] Skill descriptions are aggressive (pushy)
 - [ ] All SKILL.md bodies ≤500 lines
-- [ ] Trigger tests written (5 should + 5 should-not per skill)
+- [ ] Trigger tests written (5 should + 5 should-not per installed/created skill — skips excluded)
 - [ ] Stack conventions match the chosen type spec exactly
 
 ---

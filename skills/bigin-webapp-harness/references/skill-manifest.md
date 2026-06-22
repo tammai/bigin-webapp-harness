@@ -3,20 +3,22 @@
 
 Maps each project type to the skills installed during Phase 5 via `find-skills`.
 
+> ⚠️ **Nuxt rule** — install **`nuxt4-patterns`**, NEVER antfu's `nuxt` skill (full rule in CLAUDE.md). If the Phase 5-2 fallback authors a nuxt skill from scratch, pull current Nuxt v4 patterns from **https://nuxt.com/llms.txt** — never copy the antfu skill's content.
+
 ---
 
 ## Type 1: Fullstack MVP
 
 ```
-nuxt
+nuxt4-patterns
 nuxt-ui
 pinia
 pinia-colada
 vitest
-vueuse-functions
+vueuse
 zod
 pnpm
-cloudflare-pages
+wrangler
 drizzle               (optional — only when D1 is enabled)
 nuxt-auth-utils       (optional — only when auth is needed)
 session-handoff
@@ -29,12 +31,12 @@ session-handoff
 ## Type 2: SPA Frontend
 
 ```
-nuxt
+nuxt4-patterns
 nuxt-ui
 pinia
 pinia-colada
 vitest
-vueuse-functions
+vueuse
 zod
 pnpm
 nuxt-auth-utils       (optional — only when auth is needed)
@@ -47,13 +49,9 @@ session-handoff
 
 ## Type 3: Backend (Go)
 
-```
-session-handoff
-```
+Go projects install **no library skills via `find-skills`**. All skills — `setup`, `api-development`, `testing`, and `session-handoff` — are generated inline during Phase 5-3 from the `backend-go.md` spec. (Do not route `session-handoff` through `find-skills` for Go projects.)
 
-Go projects get no library skills from `find-skills`. The harness generates a Go-specific `setup`, `api-development`, `testing`, and `session-handoff` skill inline during Phase 5-2 from the `backend-go.md` spec.
-
-**Total: 1 skill** (session-handoff, generated inline)
+**Total: 0 skills installed via find-skills** (4 generated inline)
 
 ---
 
@@ -65,4 +63,4 @@ For each skill in the list above, invoke:
 Skill('find-skills', '{skill-name} from affaan-m/everything-claude-code')
 ```
 
-Always prefer `affaan-m/everything-claude-code` as the source registry. If a skill is not found there, fall back to other sources. `find-skills` handles discovery, checks if the skill is already installed, and performs the installation. If it cannot find a skill, note it in the harness setup summary and continue — do not abort.
+Always prefer `affaan-m/everything-claude-code` as the source registry; fall back to other sources only if a skill is not found there. `find-skills` handles discovery, already-installed checks, and installation. **If a skill cannot be found, do not silently skip it** — resolve all not-found skills with the single batched create-on-not-found fallback in SKILL.md Phase 5-2 (create at `project/.claude/skills/{name}/SKILL.md` per the 5-4 rules, install under a different name, or skip).

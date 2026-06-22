@@ -34,7 +34,7 @@ Ask the user which optional services to enable during Phase 3.
 
 ```typescript
 export default defineNuxtConfig({
-  compatibilityDate: '2025-01-01',
+  compatibilityDate: '2025-01-15',
   future: { compatibilityVersion: 4 },
   devtools: { enabled: false },
 
@@ -154,7 +154,8 @@ export default defineAppConfig({
 
 ```toml
 name = "your-app-name"
-compatibility_date = "2025-01-01"
+compatibility_date = "2025-01-15"
+compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".output/public"
 
 # Uncomment as needed:
@@ -271,10 +272,10 @@ Bindings are accessed via `event.context.cloudflare.env`.
 
 ```bash
 # Install
-npm install -D nitro-cloudflare-dev
+pnpm add -D nitro-cloudflare-dev
 
 # Run (simulates Cloudflare bindings locally)
-npm run cf-dev
+pnpm cf-dev
 ```
 
 `nitro-cloudflare-dev` reads `wrangler.toml` and injects local D1/R2/KV simulators.  
@@ -286,10 +287,10 @@ Local D1 data lives in `.wrangler/state/`.
 
 ```bash
 # Build
-npm run build
+pnpm build
 
 # Deploy to Cloudflare Pages
-npm run deploy
+pnpm deploy
 
 # First-time setup (create project in Cloudflare):
 wrangler pages project create your-app-name

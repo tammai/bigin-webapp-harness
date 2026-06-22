@@ -69,7 +69,9 @@ All `references/` paths in SKILL.md are relative to `skills/bigin-webapp-harness
 
 - Skills are **found and installed** via `Skill('find-skills', '{name}')` — never copied from a bundle
 - Always prefer `affaan-m/everything-claude-code` as the find-skills source registry; fall back to other sources only if not found there
+- ⚠️ **Nuxt rule (canonical)** — NEVER install antfu's `nuxt` skill (Nuxt 2/3, outdated) and never copy its content. Install **`nuxt4-patterns`** from `affaan-m/everything-claude-code`; if authoring one via the 5-2 fallback, source latest Nuxt v4 patterns from https://nuxt.com/llms.txt. (SKILL.md and skill-manifest.md point here — keep this the single source.)
 - If `find-skills` reports a skill is already installed, skip it silently
+- If `find-skills` **cannot find** a skill, do not silently skip — resolve all not-found skills with the single batched create-on-not-found fallback in SKILL.md Phase 5-2 (create at `project/.claude/skills/{name}/SKILL.md` per the 5-4 rules, install under a different name, or skip). Never add a created skill to this plugin or `skill-manifest.md`
 - Go Backend projects get no library skills — all skills are generated inline from the `backend-go.md` spec
 - `drizzle` and `nuxt-auth-utils` are optional: install only when the user enables D1 or auth respectively
 

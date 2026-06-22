@@ -228,9 +228,9 @@ func NewUserService(repo UserRepository) UserService {
 > Recipes must be indented with **tabs**, not spaces.
 
 ```makefile
-.PHONY: dev build test tidy lint
+.PHONY: run build test tidy
 
-dev:
+run:
 	go run ./cmd/server
 
 build:
@@ -241,9 +241,6 @@ test:
 
 tidy:
 	go mod tidy
-
-lint:
-	golangci-lint run
 ```
 
 ---
