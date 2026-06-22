@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-06-22
+
+### Fixed
+
+- **README.md:** Backend project type description still said "chi router" — updated to "Gin router" (chi was removed in v1.8.0)
+- **fullstack-mvp.md:** Local dev and deploy code blocks used `npm` instead of `pnpm` (`npm install -D` → `pnpm add -D`, `npm run build` → `pnpm build`, `npm run deploy` → `pnpm deploy`)
+- **fullstack-mvp.md:** `compatibilityDate` and `wrangler.toml` `compatibility_date` were `2025-01-01` — aligned to `2025-01-15` to match `scaffold.md`; added missing `compatibility_flags = ["nodejs_compat"]` to canonical `wrangler.toml`
+- **backend-go.md:** Makefile had target `dev` and a `lint` target that do not exist in the scaffold — renamed `dev` → `run` and removed `lint` to match `scaffold.md`
+- **SKILL.md + skill-manifest.md:** Aligned skill names (`nuxt` → `nuxt4-patterns`, `vueuse-functions` → `vueuse`, `cloudflare-pages` → `wrangler`); added explicit create-on-not-found fallback (Phase 5-2); renumbered downstream phases (5-2 → 5-3, etc.)
+- **Version:** Bumped to `1.8.1`
+
+---
+
 ## [1.8.0] - 2026-06-21
 
 ### Changed
