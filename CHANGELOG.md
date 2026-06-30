@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-06-30
+
+### Changed
+
+- **bigin-harness-setup:** The skill now initializes git and installs the pre-commit hook itself instead of printing the command for the user to run. New Phase 5-1b: ensure a git repo exists (`git init` only if not already one), then symlink `.git/hooks/pre-commit` → `scripts/pre-commit.sh`. Idempotent — never re-inits, and never clobbers a pre-existing foreign hook without confirming. Phase 7 summary and Output Checklist updated; README onboarding step retained for fresh clones (`.git/hooks/` is not version-controlled).
+- **nuxt profile — auto-format on every edit (aligned with `nuxt-fullstack-template`):** ESLint via `@nuxt/eslint` is the single formatter, Prettier disabled. The generated `.claude/settings.json` wires a `PostToolUse` hook (`Write|Edit|MultiEdit`) running `pnpm lint --fix` for the agent; a generated `.vscode/settings.json` gives humans the same via ESLint format-on-save. New `conventions.md` formatting section documents the stylistic config (`commaDangle: 'never'`, `braceStyle: '1tbs'`), `eslint.config.mjs` `withNuxt()`, and `lint-staged` (`"*.{ts,vue,js,mjs}": "eslint --fix"`). No custom script.
+- **nuxt profile — `nuxt-auth-utils` added to the stack:** session/auth standardized on the module. New Auth section in the generated `conventions.md` (`useUserSession`, `setUserSession`, `requireUserSession`, `hashPassword`/`verifyPassword`, `NUXT_SESSION_PASSWORD`), plus a hard rule in `CLAUDE.md` (auth via `nuxt-auth-utils` only). Stack lines in README and the profile spec updated.
+
+---
+
 ## [1.9.0] - 2026-06-30
 
 ### Added

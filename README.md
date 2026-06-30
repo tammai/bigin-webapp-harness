@@ -31,7 +31,7 @@ Sets up a consistent "harness level" on any repo so team members of mixed skill 
 
 | Profile  | Stack                                                                          |
 | -------- | ------------------------------------------------------------------------------ |
-| `nuxt`   | Nuxt 4 (SPA), Pinia + Pinia Colada, VueUse, Nuxt UI, Zod, Vitest, Cloudflare Pages |
+| `nuxt`   | Nuxt 4 (SPA), Nuxt ESLint, Pinia + Pinia Colada, VueUse, Nuxt UI, nuxt-auth-utils, Zod, Vitest, Cloudflare Pages |
 | `go`     | Go REST API (Gin)                                                              |
 | `nodejs` | Node.js TypeScript REST API                                                    |
 
@@ -71,8 +71,9 @@ The skill detects the stack profile (or asks), confirms before overwriting anyth
 
 ### Enforcement (the load-bearing part)
 
-- **`scripts/pre-commit.sh`** — runs lint + typecheck + tests; fails closed.
+- **`scripts/pre-commit.sh`** — runs lint + typecheck + tests; fails closed. The skill installs it as a git hook (and `git init`s the repo if needed).
 - **`.claude/guards/bash-guard.py`** — a `PreToolUse` hook that blocks the agent from weakening its own gates (`--no-verify`, `git commit -n`, force-push to main). `--force-with-lease` on a feature branch is allowed.
+- **Auto-format** (nuxt) — ESLint via `@nuxt/eslint` is the only formatter (Prettier disabled). A `PostToolUse` hook runs `pnpm lint --fix` after every agent Write/Edit; humans get the same via `.vscode/settings.json` format-on-save. Aligned with `nuxt-fullstack-template`. No custom script.
 - **`.claude/settings.json`** — pre-approves safe profile commands to reduce prompt friction.
 
 ---

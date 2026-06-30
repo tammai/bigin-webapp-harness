@@ -93,28 +93,56 @@ Skip each if `INSTALL_MODE=new` and file already exists.
 
 Read from `references/hook-guard.md` → `## pre-commit: {PROFILE}`.
 
-Write to `scripts/pre-commit.sh`. Make it executable: `chmod +x scripts/pre-commit.sh`.
+Write to `scripts/pre-commit.sh`, then make it executable: `chmod +x scripts/pre-commit.sh`.
 
-Tell the user (do not run automatically):
-```
-Install hook: ln -sf ../../scripts/pre-commit.sh .git/hooks/pre-commit
-```
+### 5-1b. Initialize git + install the hook
+
+The hook lives in `.git/hooks/`, so a git repo must exist first.
+
+1. **Ensure a git repo.** Check with `git rev-parse --is-inside-work-tree 2>/dev/null`.
+   - If it fails (not a repo), run `git init` and tell the user a repo was initialized.
+   - If it already is a repo, do nothing.
+
+2. **Install the hook** (idempotent — never clobber a foreign hook silently):
+   - If `.git/hooks/pre-commit` does not exist, or is already a symlink to `../../scripts/pre-commit.sh` → install/refresh it:
+     ```sh
+     ln -sf ../../scripts/pre-commit.sh .git/hooks/pre-commit
+     ```
+   - If `.git/hooks/pre-commit` exists and is **not** our symlink (a real file or a different target) → do NOT overwrite. Show it and ask:
+     ```
+     A pre-commit hook already exists at .git/hooks/pre-commit.
+     Replace it with the harness hook? (yes / no — leave it and I'll note it in the summary)
+     ```
+
+3. Confirm to the user that the hook is installed (or was left untouched).
+
+> Note: `.git/hooks/` is not version-controlled, so each fresh clone still needs this step — that's why Phase 6 keeps it in the README onboarding for teammates.
 
 ### 5-2. Bash guard (blocks gate bypass)
 
-Read from `references/hook-guard.md` → `## bash-guard.py`.
+Read from `references/hook-guard.md` → `## bash-guard.py`. Write to `.claude/guards/bash-guard.py`.
 
-Write to `.claude/guards/bash-guard.py`.
+> nuxt auto-format needs no script — it's a `PostToolUse` hook in the nuxt settings.json template that runs `pnpm lint --fix` (the Nuxt ESLint module) after every Write/Edit.
 
 ### 5-3. .claude/settings.json
 
 Read the template from `references/profile-{PROFILE}.md` → `## settings.json Template`.
 
 If `.claude/settings.json` already exists:
-- **Merge**: add `hooks` block and any missing `permissions.allow` entries. Never remove existing entries.
+- **Merge**: add the `hooks` block (for nuxt this includes **both** the `PreToolUse` bash guard and the `PostToolUse` ESLint formatter) and any missing `permissions.allow` entries. Never remove existing entries.
+- If the file already has a `hooks` block, merge per-event: append our hook entries without dropping the user's.
 - Show the additions before writing.
 
 If it doesn't exist: write fresh.
+
+### 5-3b. .vscode/settings.json (nuxt only)
+
+Editor format-on-save via ESLint. Read `references/profile-nuxt.md` → `## .vscode/settings.json Template`.
+
+- If `.vscode/settings.json` exists: **merge** the keys in (never overwrite; show additions first).
+- If not: write fresh.
+
+Other profiles: skip.
 
 ### 5-4. Optional: code-reviewer agent
 
@@ -169,11 +197,14 @@ Created:
   scripts/pre-commit.sh
   [.claude/agents/code-reviewer.md] (if opted in)
 
+Enabled:
+  git repo [initialized/already present]
+  pre-commit hook [installed/left untouched]
+
 Next steps:
-  1. ln -sf ../../scripts/pre-commit.sh .git/hooks/pre-commit
-  2. {LINT} && {TYPECHECK} && {TEST}
-  3. Read CLAUDE.md + AI_TASK_GUIDE.md
-  4. One scoped task through all gates — confirm the harness works.
+  1. {LINT} && {TYPECHECK} && {TEST}
+  2. Read CLAUDE.md + AI_TASK_GUIDE.md
+  3. One scoped task through all gates — confirm the harness works.
 ```
 
 ---
@@ -184,6 +215,8 @@ Next steps:
 - `INSTALL_MODE=yes` → overwrite. `INSTALL_MODE=new` → skip existing.
 - `.claude/settings.json` — always merge (never full overwrite if file exists).
 - `README.md` — append only; never overwrite; check for `## AI Onboarding` first.
+- `git init` — only if not already a repo (never re-init).
+- pre-commit hook — install only if absent or already ours; confirm before replacing a foreign hook.
 - Never delete files not part of the harness.
 
 ---
@@ -198,7 +231,9 @@ Next steps:
 - [ ] `AI_REVIEW_CHECKLIST.md` — profile commands filled in
 - [ ] `scripts/pre-commit.sh` — lint + typecheck + test for profile, executable
 - [ ] `.claude/guards/bash-guard.py` — blocks `--no-verify` and force-push to main
-- [ ] `.claude/settings.json` — hook wired + profile permissions
+- [ ] `.claude/settings.json` — guards wired (nuxt also gets a PostToolUse `pnpm lint --fix` auto-format hook) + profile permissions
+- [ ] **nuxt only** — `.vscode/settings.json` with ESLint format-on-save (Prettier disabled), merged if it existed
+- [ ] git repo initialized (if it wasn't one) and `.git/hooks/pre-commit` installed (or foreign hook left untouched with confirmation)
 - [ ] `README.md` — AI Onboarding section appended (if README existed)
 
 ---

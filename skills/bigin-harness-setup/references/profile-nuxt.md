@@ -1,6 +1,6 @@
 # Nuxt Profile Templates
 
-Stack: Nuxt 4 SPA, Pinia + Pinia Colada, VueUse, Nuxt UI, Vitest, Zod, Cloudflare Pages
+Stack: Nuxt 4 SPA, Nuxt ESLint, Pinia + Pinia Colada, VueUse, Nuxt UI, nuxt-auth-utils, Zod, Vitest, Cloudflare Pages
 
 ---
 
@@ -8,11 +8,14 @@ Stack: Nuxt 4 SPA, Pinia + Pinia Colada, VueUse, Nuxt UI, Vitest, Zod, Cloudflar
 
 ```
 lint:       pnpm lint
+format:     pnpm lint --fix
 typecheck:  pnpm type-check
 test:       pnpm test --run
 build:      pnpm build
 dev:        pnpm dev
 ```
+
+Every file created or edited is auto-formatted by the Nuxt ESLint module: the `PostToolUse` hook in `.claude/settings.json` runs `pnpm lint --fix` after every Write/Edit. No custom script — it uses the project's own `lint` script (`@nuxt/eslint` flat config).
 
 ---
 
@@ -22,6 +25,7 @@ dev:        pnpm dev
 # CLAUDE.md
 
 Stack: Nuxt 4 SPA · Cloudflare Pages
+Auth: nuxt-auth-utils (sealed session cookie)
 Runtime: Node ≥22 · pnpm only
 
 ## Commands
@@ -30,6 +34,7 @@ Runtime: Node ≥22 · pnpm only
 | dev       | `pnpm dev`         |
 | test      | `pnpm test --run`  |
 | lint      | `pnpm lint`        |
+| format    | `pnpm lint --fix`  |
 | typecheck | `pnpm type-check`  |
 | build     | `pnpm build`       |
 
@@ -37,9 +42,11 @@ Runtime: Node ≥22 · pnpm only
 See `.claude/rules/` — conventions, security, architecture.
 
 ## Hard Rules (non-negotiable)
+- Files are auto-formatted with Nuxt ESLint on every create/edit (PostToolUse hook). Never disable the hook.
 - No `--no-verify`. No `eslint-disable` without a justifying comment. No weakening eslint config to pass checks.
 - No `@ts-ignore` or `as any` without a justifying comment.
 - No unauthenticated endpoints.
+- Auth/session via `nuxt-auth-utils` only — never roll your own session or token store.
 - `openapi.yaml` is the API contract. Types generated from it — never hardcoded.
 - All HTTP requests via `plugins/api.ts` only (Bearer token attached there).
 
@@ -93,6 +100,19 @@ pnpm openapi-typescript openapi.yaml -o types/api.d.ts
 Import: `import type { paths, components } from '~/types/api'`
 Never define API response shapes inline — always use generated types.
 
+## Auth — nuxt-auth-utils
+
+Session management uses `nuxt-auth-utils`. Never hand-roll session or token storage.
+
+- Read session in components/pages: `const { loggedIn, user, session } = useUserSession()`
+- Set session in a server route: `await setUserSession(event, { user })`
+- Clear: `await clearUserSession(event)`
+- Protect server routes: `const { user } = await requireUserSession(event)`
+- Hash/verify passwords: `hashPassword` / `verifyPassword` from the module.
+- Session secret comes from `NUXT_SESSION_PASSWORD` (env only — never committed).
+
+Requires server routes (Nitro), which run on Cloudflare Pages even with `ssr: false`. The Bearer token for the separate backend (`plugins/api.ts`) is sourced from the session — not stored separately.
+
 ## State
 - Global state: Pinia stores (`stores/`)
 - Async data fetching: Pinia Colada queries (`useQuery`, `useMutation`)
@@ -101,6 +121,23 @@ Never define API response shapes inline — always use generated types.
 ## Component rules
 - No business logic in components. Move it to a composable or store.
 - Props typed with `defineProps<{}>()`. Events typed with `defineEmits<{}>()`.
+
+## Formatting — ESLint only (no Prettier)
+
+Formatting is ESLint via `@nuxt/eslint`. **Prettier is disabled** — never add it.
+
+- `eslint.config.mjs`: `import withNuxt from './.nuxt/eslint.config.mjs'` → `export default withNuxt()`.
+- Stylistic config in `nuxt.config.ts`:
+  ```ts
+  eslint: { config: { stylistic: { commaDangle: 'never', braceStyle: '1tbs' } } }
+  ```
+- Lint command: `eslint .` (the `lint` script). Fix: `eslint . --fix`.
+- Commit-time fix via `lint-staged` in `package.json`:
+  ```json
+  "lint-staged": { "*.{ts,vue,js,mjs}": "eslint --fix" }
+  ```
+- Editor format-on-save uses the ESLint extension (`.vscode/settings.json`), not Prettier.
+- Claude auto-formats every Write/Edit via the `pnpm lint --fix` `PostToolUse` hook in `.claude/settings.json`.
 ```
 
 ---
@@ -153,7 +190,35 @@ Never define API response shapes inline — always use generated types.
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm lint --fix"
+          }
+        ]
+      }
     ]
+  }
+}
+```
+
+---
+
+## .vscode/settings.json Template
+
+Editor format-on-save through the ESLint extension (matches `nuxt-fullstack-template`). Merge into an existing `.vscode/settings.json` rather than overwriting.
+
+```json
+{
+  "prettier.enable": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
   }
 }
 ```
