@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-06-30
+
+### Changed
+
+- **nuxt profile — remove D1/KV/R2/Drizzle (BFF layer, not direct-DB):** The Nuxt app is a BFF proxy — the backend owns data persistence. Removed from all surfaces:
+  - Stack listing in SKILL.md, profile-nuxt.md, README.md: `Drizzle/D1` dropped; profile now reads "BFF proxy layer, no D1/KV/R2".
+  - `scaffold-nuxt.md`: after cloning `tammai/nuxt-fullstack-template`, a new cleanup step removes Drizzle deps (`drizzle-orm`, `drizzle-kit`), `server/db/`, `drizzle.config.ts`, D1/KV blocks in `wrangler.toml`, and `db:*` scripts from `package.json`. Wrangler itself stays (still needed for Cloudflare Pages deployment).
+  - `profile-nuxt.md`: stack header updated.
+
+---
+
 ## [1.10.1] - 2026-06-30
 
 ### Fixed

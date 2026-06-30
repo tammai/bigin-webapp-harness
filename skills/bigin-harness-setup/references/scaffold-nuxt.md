@@ -2,7 +2,9 @@
 
 Used by SKILL.md Phase 0.5 when the nuxt profile is chosen and the repo has **no `nuxt.config.ts`**. Lays the full Nuxt 4 fullstack app from `tammai/nuxt-fullstack-template` into the **current** repo (not a subfolder), then the harness overlay is applied on top.
 
-The template already ships: `nuxt.config.ts` (modules + cloudflare-pages + stylistic eslint), `eslint.config.mjs`, `@nuxt/eslint`, `nuxt-auth-utils`, Pinia/Colada/VueUse/Nuxt UI/Zod, Drizzle + Wrangler, Vitest + Playwright, `simple-git-hooks` + `lint-staged`, `.vscode/settings.json`, and its own `CLAUDE.md`.
+The template already ships: `nuxt.config.ts` (modules + cloudflare-pages + stylistic eslint), `eslint.config.mjs`, `@nuxt/eslint`, `nuxt-auth-utils`, Pinia/Colada/VueUse/Nuxt UI/Zod, Vitest + Playwright, `simple-git-hooks` + `lint-staged`, `.vscode/settings.json`, and its own `CLAUDE.md`.
+
+> The template also includes Drizzle + Wrangler D1/KV bindings from its fullstack roots — these are **removed during scaffold** (step 3) because the Nuxt app is a BFF proxy layer; the backend owns data persistence.
 
 > The `nuxt-fullstack-scaffold` skill is the canonical scaffolder, but it creates a **new subdirectory**. Here we scaffold **in place**. Reuse its customization steps (project name, theme, Cloudflare IDs) — do not duplicate its logic beyond the in-place clone below.
 
@@ -25,10 +27,14 @@ The template already ships: `nuxt.config.ts` (modules + cloudflare-pages + styli
    ```
    If the repo is not yet a git repo, Phase 5-1b will `git init` later.
 
-3. **Customize** (per the `nuxt-fullstack-scaffold` skill, steps 3–5):
-   - `package.json` `name`, `wrangler.toml` `name` + `database_name` → the project name (kebab-case; ask if unknown).
+3. **Customize + strip DB layer:**
+   - `package.json` `name` and `wrangler.toml` `name` → the project name (kebab-case; ask if unknown).
    - Theme in `app/app.config.ts` (primary / neutral / size) — ask, else keep defaults.
-   - Cloudflare D1 / KV IDs in `wrangler.toml` — ask, else leave placeholders.
+   - Remove Drizzle and D1/KV bindings (BFF doesn't access the DB directly):
+     - `pnpm remove drizzle-orm drizzle-kit @libsql/client` (or equivalent Drizzle deps in the template)
+     - Remove `server/db/` directory and any `drizzle.config.ts`
+     - Remove `[[d1_databases]]` and `[[kv_namespaces]]` blocks from `wrangler.toml`
+     - Remove any `db:*` scripts from `package.json`
 
 4. **Install + hooks:**
    ```sh

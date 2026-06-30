@@ -1,6 +1,6 @@
 # Nuxt Profile Templates
 
-Stack: Nuxt 4 fullstack (Cloudflare Pages), Nuxt ESLint, Pinia + Pinia Colada, VueUse, Nuxt UI, nuxt-auth-utils, Drizzle/D1, Zod, Vitest
+Stack: Nuxt 4 fullstack (Cloudflare Pages), Nuxt ESLint, Pinia + Pinia Colada, VueUse, Nuxt UI, nuxt-auth-utils, Zod, Vitest — BFF proxy layer (no Drizzle/D1/KV/R2; the backend owns data persistence)
 
 Empty repo → scaffolded from `tammai/nuxt-fullstack-template` (SKILL.md Phase 0.5 / `references/scaffold-nuxt.md`).
 

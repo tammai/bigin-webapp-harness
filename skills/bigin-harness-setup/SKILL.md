@@ -21,7 +21,7 @@ Check for stack indicators:
 
 ```
 Which stack profile?
-1. nuxt   — Nuxt 4 fullstack (Cloudflare): Nuxt UI, Pinia + Colada, VueUse, nuxt-auth-utils, Drizzle/D1, Vitest, Zod
+1. nuxt   — Nuxt 4 fullstack (Cloudflare Pages): Nuxt UI, Pinia + Colada, VueUse, nuxt-auth-utils, Vitest, Zod — BFF proxy layer, no direct DB access
 2. go     — Go REST API backend
 3. nodejs — Node.js TypeScript REST API backend
 
