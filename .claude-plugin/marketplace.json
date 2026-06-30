@@ -7,17 +7,17 @@
   },
   "plugins": [
     {
-      "name": "bigin-webapp-harness",
+      "name": "bigin-skills",
       "source": "./",
-      "description": "Web app harness factory for Claude Code — Nuxt v4 fullstack MVP, SPA frontend, and Go backend.",
+      "description": "BigIn's Claude Code skills — harness setup (governance + enforcement gates for nuxt/go/nodejs) and session handoff.",
       "author": {
         "name": "Tam Mai",
         "email": "tam.mai@bigin.vn"
       },
-      "homepage": "https://github.com/tammai/bigin-webapp-harness",
-      "repository": "https://github.com/tammai/bigin-webapp-harness",
+      "homepage": "https://github.com/tammai/bigin-skills",
+      "repository": "https://github.com/tammai/bigin-skills",
       "license": "MIT",
-      "keywords": ["harness", "nuxt", "nuxt-v4", "cloudflare", "go-backend", "spa", "fullstack", "subagent"]
+      "keywords": ["harness", "harness-setup", "ai-governance", "enforcement-hooks", "nuxt", "go-backend", "nodejs-backend", "session-handoff"]
     }
   ]
 }

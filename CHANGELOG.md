@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-06-30
+
+### Added
+
+- **bigin-harness-setup skill:** New skill that scaffolds a standardized AI workflow harness into any repo — CLAUDE.md, scoped governance rules, enforcement hooks, and per-stack conventions. Supports `nuxt`, `go`, and `nodejs` profiles. Idempotent re-runs are safe.
+  - `SKILL.md`: 8-phase workflow (detect profile → detect existing → generate CLAUDE.md + rules + AI files → enforcement → README update → summary)
+  - `references/profile-nuxt.md`: Nuxt 4 SPA templates (CLAUDE.md, conventions with centralized `plugins/api.ts` Bearer pattern + openapi-typescript, settings.json)
+  - `references/profile-go.md`: Go/Gin templates (CLAUDE.md, conventions with handler pattern + openapi-first, settings.json)
+  - `references/profile-nodejs.md`: Node.js TypeScript templates (CLAUDE.md, conventions with Zod boundary validation + openapi-typescript, settings.json)
+  - `references/files-shared.md`: Shared templates (security.md, architecture.md, AI_TASK_GUIDE.md with spec gate, AI_REVIEW_CHECKLIST.md, optional code-reviewer agent)
+  - `references/hook-guard.md`: `bash-guard.py` (blocks `--no-verify` and force-push) + pre-commit scripts per profile
+
+### Changed
+
+- **BREAKING — Plugin and repo renamed `bigin-webapp-harness` → `bigin-skills`.** The plugin is now a collection of skills rather than a single harness factory. Install commands change to `/plugin marketplace add tammai/bigin-skills` and `/plugin install bigin-skills@bigin`. GitHub auto-redirects the old `tammai/bigin-webapp-harness` URL, but existing installs should re-add the marketplace and reinstall under the new name.
+  - GitHub repo renamed `tammai/bigin-webapp-harness` → `tammai/bigin-skills`.
+  - `plugin.json` / `marketplace.json`: `name` updated to `bigin-skills`; homepage/repository URLs, description, and keywords updated.
+  - `README.md` / `CLAUDE.md`: rewritten around the skill collection.
+
+### Removed
+
+- **bigin-webapp-harness skill** (`skills/bigin-webapp-harness/` — SKILL.md + 7 reference files) — the Nuxt/Go agent-team harness factory. Removed in favor of `bigin-harness-setup`. Historical changelog entries below are retained.
+
+---
+
 ## [1.8.1] - 2026-06-22
 
 ### Fixed

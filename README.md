@@ -1,69 +1,79 @@
-# bigin-webapp-harness
+# bigin-skills
 
-**Web App Harness Factory for Claude Code**  
-_Nhà máy tạo Harness Ứng dụng Web cho Claude Code_
+**BigIn's collection of Claude Code skills**
+_Bộ skill Claude Code của BigIn_
 
-A meta-skill that turns a project description into a specialized agent team and the skills they use — focused on three web development stacks.
-
----
-
-## Project Types / Loại dự án
-
-| Type              | Stack                | Description                                                                                             |
-| ----------------- | -------------------- | ------------------------------------------------------------------------------------------------------- |
-| **Fullstack MVP** | Nuxt v4 + Cloudflare | Nuxt UI, Tailwind, Pinia, Pinia Colada, VueUse, Nitro (cloudflare-pages), D1/R2/KV (optional), Wrangler |
-| **SPA Frontend**  | Nuxt v4, SSR false   | Nuxt UI, Tailwind, Pinia, Pinia Colada, VueUse, client-side only                                        |
-| **Backend**       | Go                   | Gin router, standard project layout, testify                                                            |
-
-**All Nuxt types share:** Google Sans font, primary blue / neutral slate theme, `ssr: false`.
+Skills for standardized, AI-assisted development across BigIn's stacks.
 
 ---
 
-## Usage / Cách dùng
+## Skills
+
+| Skill                  | Purpose                                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| **bigin-harness-setup** | Scaffolds an AI workflow harness into a repo — `CLAUDE.md`, scoped rules, and enforcement gates. Profiles: `nuxt`, `go`, `nodejs`. |
+| **session-handoff**     | Saves session state (tasks, decisions, uncommitted changes) to `SESSION.md` and restores it on resume.   |
+
+---
+
+## bigin-harness-setup
+
+Sets up a consistent "harness level" on any repo so team members of mixed skill levels produce consistent, maintainable output.
+
+### Principles
+
+- **Guidance defines intent; gates enforce it mechanically.** Anything left to judgment varies by skill level — so the value is in the gates, not more docs.
+- **Single source of truth.** Reference shared rules, never duplicate them.
+- **No overhead.** Lean, scannable markdown — a rule nobody reads is worse than no rule.
+- **Additive-first cross-repo contract.** `openapi.yaml` is the contract between frontend and backend. Backend leads with backward-compatible changes; a breaking change requires a version bump. Frontend generates types from `openapi.yaml` — never hardcoded.
+
+### Profiles
+
+| Profile  | Stack                                                                          |
+| -------- | ------------------------------------------------------------------------------ |
+| `nuxt`   | Nuxt 4 (SPA), Pinia + Pinia Colada, VueUse, Nuxt UI, Zod, Vitest, Cloudflare Pages |
+| `go`     | Go REST API (Gin)                                                              |
+| `nodejs` | Node.js TypeScript REST API                                                    |
+
+### What gets generated
+
+```
+your-repo/
+├── CLAUDE.md                      ← thin contract: stack, commands, hard rules
+├── AI_TASK_GUIDE.md               ← per-task workflow + spec gate
+├── AI_REVIEW_CHECKLIST.md         ← definition of done (profile commands filled in)
+├── .claude/
+│   ├── rules/
+│   │   ├── conventions.md         ← naming, patterns (profile-specific)
+│   │   ├── security.md            ← shared security rules
+│   │   └── architecture.md        ← shared base + profile addendum
+│   ├── guards/
+│   │   └── bash-guard.py          ← blocks --no-verify and force-push to main
+│   ├── settings.json              ← pre-approved commands + hook wiring
+│   └── agents/
+│       └── code-reviewer.md       ← optional, read-only (opt-in)
+├── scripts/
+│   └── pre-commit.sh              ← lint + typecheck + test for the profile
+└── README.md                      ← AI Onboarding section appended
+```
+
+### Usage
 
 Trigger in Claude Code with:
 
 ```
-Build a harness for this project
 Set up a harness
-Tạo harness cho dự án này
-Cấu hình harness
+Add AI rules to this repo
+Thiết lập harness
 ```
 
-The skill will guide you through:
+The skill detects the stack profile (or asks), confirms before overwriting anything, and prints onboarding next steps. Re-running on an already-set-up repo is safe (idempotent).
 
-1. Choosing your project type (Fullstack MVP / SPA / Backend Go)
-2. Selecting which agent roles you want
-3. Confirming your stack and optional services
-4. Generating all agent definitions and skills
+### Enforcement (the load-bearing part)
 
----
-
-## What Gets Generated / Những gì được tạo ra
-
-```
-your-project/
-├── .claude/
-│   ├── agents/
-│   │   ├── architect.md
-│   │   ├── frontend-dev.md
-│   │   ├── api-dev.md          ← fullstack only
-│   │   ├── database-dev.md     ← only if D1 enabled
-│   │   ├── deployment.md       ← fullstack only
-│   │   ├── state-dev.md        ← SPA only
-│   │   ├── backend-dev.md      ← Go only
-│   │   └── qa.md
-│   └── skills/
-│       ├── webapp-harness/     ← orchestrator
-│       │   └── SKILL.md
-│       ├── setup/
-│       ├── ui-development/
-│       ├── api-development/    ← fullstack only
-│       ├── database/           ← if D1 enabled
-│       ├── deployment/         ← fullstack only
-│       └── state-management/   ← SPA only
-└── _workspace/                 ← intermediate outputs (audit trail)
-```
+- **`scripts/pre-commit.sh`** — runs lint + typecheck + tests; fails closed.
+- **`.claude/guards/bash-guard.py`** — a `PreToolUse` hook that blocks the agent from weakening its own gates (`--no-verify`, `git commit -n`, force-push to main). `--force-with-lease` on a feature branch is allowed.
+- **`.claude/settings.json`** — pre-approves safe profile commands to reduce prompt friction.
 
 ---
 
@@ -72,70 +82,39 @@ your-project/
 ### Via Marketplace
 
 ```
-/plugin marketplace add tammai/bigin-webapp-harness
-/plugin install bigin-webapp-harness@bigin
+/plugin marketplace add tammai/bigin-skills
+/plugin install bigin-skills@bigin
 ```
 
-### Direct (Global Skill)
+### Direct (single skill)
 
 ```bash
-cp -r skills/bigin-webapp-harness ~/.claude/skills/bigin-webapp-harness
+cp -r skills/bigin-harness-setup ~/.claude/skills/bigin-harness-setup
 ```
-
-**Requirement:** Claude Code with Agent support enabled.
-
----
-
-## Architecture Patterns Used
-
-| Pattern            | When                               | Default?              |
-| ------------------ | ---------------------------------- | --------------------- |
-| **Pipeline**       | Architect → Build → QA sequential  | ✅ All types          |
-| **Fan-out/Fan-in** | Parallel builder agents in Phase 2 | ✅ Fullstack MVP, SPA |
-| **Sub-agents**     | All agent execution                | ✅ Default mode       |
 
 ---
 
 ## Plugin Structure
 
 ```
-bigin-webapp-harness/
+bigin-skills/
 ├── .claude-plugin/
-│   ├── plugin.json                        ← plugin metadata (name, version, author)
-│   └── marketplace.json                   ← marketplace registry entry
+│   ├── plugin.json                ← plugin metadata (name, version, author)
+│   └── marketplace.json           ← marketplace registry entry
 ├── skills/
-│   ├── bigin-webapp-harness/              ← Harness factory (main skill, globally registered)
-│   │   ├── SKILL.md                       ← 8-phase workflow
+│   ├── bigin-harness-setup/       ← harness scaffolder
+│   │   ├── SKILL.md               ← 8-phase workflow
 │   │   └── references/
-│   │       ├── fullstack-mvp.md           ← Nuxt v4 + Cloudflare spec
-│   │       ├── spa-frontend.md            ← Nuxt v4 SPA spec
-│   │       ├── backend-go.md              ← Go backend spec
-│   │       ├── agent-roles.md             ← Role catalog + agent file templates
-│   │       ├── orchestrator-template.md   ← Sub-agent orchestrator templates A/B/C
-│   │       ├── scaffold.md                ← Project scaffold templates
-│   │       └── skill-manifest.md          ← Type → skills mapping
-│   └── session-handoff/                   ← Session state persistence skill
+│   │       ├── profile-nuxt.md
+│   │       ├── profile-go.md
+│   │       ├── profile-nodejs.md
+│   │       ├── files-shared.md    ← security, architecture, task guide, review checklist, code-reviewer
+│   │       └── hook-guard.md      ← bash-guard.py + pre-commit scripts per profile
+│   └── session-handoff/           ← session state persistence
 │       └── SKILL.md
+├── CHANGELOG.md
 └── README.md
 ```
-
-**Library skills (nuxt4-patterns, pinia, etc.) are fetched from `affaan-m/everything-claude-code` and installed into target projects on demand during Phase 5 — they are not part of this plugin.**
-
-## Skills Installed at Harness-Time
-
-| Skill                        | Purpose                                              | Project types            |
-| ---------------------------- | ---------------------------------------------------- | ------------------------ |
-| `nuxt4-patterns`             | Nuxt v4 core config, routing, data fetching           | Fullstack MVP, SPA       |
-| `nuxt-ui`                    | Component library, design system, forms, layouts     | Fullstack MVP, SPA       |
-| `pinia`                      | Stores, composables, SSR patterns, testing           | Fullstack MVP, SPA       |
-| `pinia-colada`               | Async queries, mutations, cache, patterns            | Fullstack MVP, SPA       |
-| `vitest`                     | Unit/component test setup, patterns, coverage        | Fullstack MVP, SPA       |
-| `vueuse`                     | VueUse composables reference (mouse, storage, etc.)   | Fullstack MVP, SPA       |
-| `zod`                        | Schema validation, type inference, form + API guards | Fullstack MVP, SPA       |
-| `pnpm`                       | Package manager conventions, lockfile, CI setup      | All                      |
-| `wrangler`                   | Cloudflare CLI: Wrangler config, D1/R2/KV, deploy     | Fullstack MVP            |
-| `drizzle`                    | Drizzle ORM schema, migrations, queries for D1       | Fullstack MVP (D1 opt)   |
-| `nuxt-auth-utils`            | Sessions, OAuth, password hashing, WebAuthn          | Fullstack MVP, SPA (opt) |
 
 ---
 

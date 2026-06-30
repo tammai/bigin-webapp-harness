@@ -4,127 +4,82 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A **Claude Code plugin** — a collection of skills and agent definitions that are installed into other projects, not executed here. There is no build step, test suite, or dev server. All work is authoring markdown files in the right structure.
+A **Claude Code plugin** (`bigin-skills`) — a collection of skills installed into other projects, not executed here. There is no build step, test suite, or dev server. All work is authoring markdown (and a small guard script) in the right structure.
 
 ## Plugin structure
 
 ```
 .claude-plugin/
-  plugin.json        ← plugin metadata (name, version, author, keywords)
+  plugin.json        ← plugin metadata (name: bigin-skills, version, author, keywords)
   marketplace.json   ← marketplace registry entry (used by /plugin marketplace)
 skills/
-  bigin-webapp-harness/   ← the main harness factory skill (globally registered)
-    SKILL.md              ← 8-phase workflow (the core logic)
-    references/           ← spec files loaded on demand during the workflow
+  bigin-harness-setup/   ← scaffolds an AI workflow harness into a target repo
+    SKILL.md             ← 8-phase workflow
+    references/          ← per-profile templates + shared files + hook/guard scripts
+  session-handoff/       ← session state persistence (SESSION.md)
+    SKILL.md
 ```
 
-All `references/` paths in SKILL.md are relative to `skills/bigin-webapp-harness/references/`.
+All `references/` paths in a SKILL.md are relative to that skill's own `references/` directory.
 
-## How the harness skill works
+## Skills
 
-`skills/bigin-webapp-harness/SKILL.md` is an 8-phase workflow:
+### bigin-harness-setup
 
-| Phase | What happens                                                                                          |
-| ----- | ----------------------------------------------------------------------------------------------------- |
-| 0     | Detect empty repo → set `scaffold_needed` flag                                                        |
-| 1     | User picks project type (Fullstack MVP / SPA / Go Backend)                                            |
-| 2     | User selects agent roles from the catalog                                                             |
-| 3     | Confirm stack + optional services (D1, R2, KV, auth)                                                  |
-| 3.5   | Scaffold empty repo from `references/scaffold.md` (if needed)                                         |
-| 4     | Generate `.claude/agents/{role}.md` files in the target project                                       |
-| 5     | Install library skills into target project via `find-skills`; generate project-specific skills inline |
-| 6     | Generate orchestrator skill at target `.claude/skills/webapp-harness/SKILL.md`                        |
-| 7     | Validate structure, trigger tests, dry-run                                                            |
+Scaffolds a standardized AI workflow harness into a target repo: `CLAUDE.md`, `.claude/rules/`, `AI_TASK_GUIDE.md`, `AI_REVIEW_CHECKLIST.md`, enforcement hooks (`scripts/pre-commit.sh` + `.claude/guards/bash-guard.py`), and `.claude/settings.json`. Three stack profiles: `nuxt`, `go`, `nodejs`.
 
-## Key reference files
+Core philosophy baked into what it generates:
 
-- `references/agent-roles.md` — full role catalog + agent file templates per project type
-- `references/scaffold.md` — exact files to create for each project type when scaffolding
-- `references/skill-manifest.md` — which skills get installed per project type (via find-skills)
-- `references/orchestrator-template.md` — sub-agent orchestrator templates (A/B/C variants)
-- `references/fullstack-mvp.md`, `references/spa-frontend.md`, `references/backend-go.md` — canonical stack specs
+1. **Guidance defines intent; gates enforce it mechanically.** The value is in the gates, not more docs.
+2. **Single source of truth.** Reference shared rules, never duplicate.
+3. **No overhead.** Lean, scannable markdown. Cut anything that doesn't change behavior.
+4. **Additive-first cross-repo contract.** Backend leads with backward-compatible changes; breaking change = version bump.
+5. **`openapi.yaml` is the contract source of truth.** Frontend generates types from it.
+
+Key reference files:
+
+- `references/profile-{nuxt,go,nodejs}.md` — per-profile `CLAUDE.md`, `conventions.md`, architecture addendum, `settings.json`, commands
+- `references/files-shared.md` — `security.md`, `architecture.md` base, `AI_TASK_GUIDE.md`, `AI_REVIEW_CHECKLIST.md`, optional `code-reviewer` agent
+- `references/hook-guard.md` — `bash-guard.py` + per-profile `pre-commit.sh`
+
+The skill is **idempotent** — re-running on a set-up repo never clobbers without confirmation; `settings.json` is merged, `README.md` is append-only.
+
+### session-handoff
+
+Saves/restores session state to `.claude/memory/SESSION.md`. Triggers: `/save-session`, `/load-session`, `/complete-session`, "near limit".
 
 ## Conventions when editing skills
 
 **SKILL.md files:**
 
 - Keep body ≤ 500 lines; move supporting detail into `references/`
-- The `description:` frontmatter field is the trigger — make it specific and "pushy" (lists exact phrases that should activate it)
+- The `description:` frontmatter field is the trigger — make it specific and "pushy" (list exact phrases that should activate it)
 - Use bilingual section headers: `## Section Name / Tên phần`
 
-**Agent definition files** (generated into target projects, but templated here):
+**Generated files (templated in `references/`, written into target repos):**
 
-- `architect` always gets `model: opus`; all other agents get `model: sonnet`
-- QA agents must use `agentType: general-purpose` (not `Explore` — Explore is read-only)
-
-**Scaffold rules (Phase 3.5) — Nuxt types:**
-
-- Scaffold uses `pnpm create nuxt@latest . --template ui --packageManager pnpm --no-gitInit --no-install` then adds packages and writes configs on top
-- Ask customization questions (app name, primary color, neutral color, font) **before** running any commands
-- Runs `pnpm install` automatically at the end — project is ready to develop after scaffold
-- `nuxt-auth-utils` is optional: add only when user enables auth in Phase 3
-- Non-interactive flags required (no TTY in Claude's bash): `--no-gitInit`, `--no-install`; fallback: `--gitInit=false`
-
-**Skill install rules (Phase 5):**
-
-- Skills are **found and installed** via `Skill('find-skills', '{name}')` — never copied from a bundle
-- Always prefer `affaan-m/everything-claude-code` as the find-skills source registry; fall back to other sources only if not found there
-- ⚠️ **Nuxt rule (canonical)** — NEVER install antfu's `nuxt` skill (Nuxt 2/3, outdated) and never copy its content. Install **`nuxt4-patterns`** from `affaan-m/everything-claude-code`; if authoring one via the 5-2 fallback, source latest Nuxt v4 patterns from https://nuxt.com/llms.txt. (SKILL.md and skill-manifest.md point here — keep this the single source.)
-- If `find-skills` reports a skill is already installed, skip it silently
-- If `find-skills` **cannot find** a skill, do not silently skip — resolve all not-found skills with the single batched create-on-not-found fallback in SKILL.md Phase 5-2 (create at `project/.claude/skills/{name}/SKILL.md` per the 5-4 rules, install under a different name, or skip). Never add a created skill to this plugin or `skill-manifest.md`
-- Go Backend projects get no library skills — all skills are generated inline from the `backend-go.md` spec
-- `drizzle` and `nuxt-auth-utils` are optional: install only when the user enables D1 or auth respectively
-
-**Phase 7 skill trigger tests:**
-
-- For each generated skill, produce 5 **should-trigger** queries (explicit + implicit, EN + VI) and 5 **should-NOT-trigger** near-miss queries (similar topic, wrong skill)
-- A good near-miss: "Update the color theme" (ui-development vs state-management). A bad near-miss: "Write a poem" — obviously irrelevant, no test value.
-
-**Orchestrator sub-agent pattern (generated into target projects):**
-
-- `_workspace/` in the project root holds intermediate outputs; file naming: `{phase}_{agent}_{artifact}.{ext}` (e.g. `02_builder_components.md`)
-- Setup agent runs sequentially first; builder agents run in parallel; QA agent runs last (sequential)
+- Keep each generated file SHORT — terse, scannable, no verbose prose. A rule nobody reads is worse than no rule.
+- Never duplicate rule content across generated files; reference the single source.
+- `bash-guard.py` is the load-bearing gate — if you change its regexes, test them (block `--no-verify`, `git commit -n`, `git push --force`; allow `--force-with-lease`, normal commits, and commit messages that merely contain `-n`).
+- `architect`-style agents get `model: opus`; all other agents get `model: sonnet`. QA/reviewer agents use `agentType: general-purpose` (not `Explore` — read-only, cannot run scripts).
 
 ## Versioning
 
-Version is in `.claude-plugin/plugin.json`. Bump it when publishing changes.
+Version lives in `.claude-plugin/plugin.json`. Bump it when publishing changes, and add a `CHANGELOG.md` entry.
 
 ## Session Handoff / Chuyển tiếp phiên
 
-When approaching usage limits or needing to pause work, use the session-handoff skill to save state.
+When approaching usage limits or needing to pause, use the session-handoff skill to save state to `.claude/memory/SESSION.md`. On session start, if found with `status: in-progress`, prompt to resume or start fresh.
 
-**Auto-load at session start:**
-
-- Check for `.claude/memory/SESSION.md`
-- If found with `status: in-progress`, prompt: "Resume previous session or start fresh?"
-- Display saved context (tasks, decisions, uncommitted changes) on resume
-
-**Manual triggers:**
-
-- `/save-session` — Save current state (tasks, decisions, uncommitted changes) to SESSION.md
-- `/load-session` — Load and display SESSION.md
-- `/complete-session` — Archive session as complete after work is done
-
-**SESSION.md location:**
+## Installation (for users of this plugin)
 
 ```
-.claude/memory/SESSION.md
+/plugin marketplace add tammai/bigin-skills
+/plugin install bigin-skills@bigin
 ```
 
-**During harness execution:**
-
-- SESSION.md includes harness-specific state (current phase, project type, selected agents, progress)
-- On resume, harness continues from the next uncompleted phase
-
-## Installation commands (for users of this plugin)
-
-```
-/plugin marketplace add tammai/bigin-webapp-harness
-/plugin install bigin-webapp-harness@bigin
-```
-
-Direct copy (global skill only):
+Direct copy (single skill):
 
 ```bash
-cp -r skills/bigin-webapp-harness ~/.claude/skills/bigin-webapp-harness
+cp -r skills/bigin-harness-setup ~/.claude/skills/bigin-harness-setup
 ```

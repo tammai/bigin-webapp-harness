@@ -1,24 +1,22 @@
 {
-  "name": "bigin-webapp-harness",
-  "version": "1.8.1",
-  "description": "Web app harness factory for Claude Code — a meta-skill that turns a project description into a specialized agent team and the skills they use, focused on Nuxt v4 fullstack MVP, SPA frontend, and Go backend. / Nhà máy tạo harness ứng dụng web cho Claude Code — meta-skill chuyển mô tả dự án thành nhóm agent chuyên biệt và các skill tương ứng.",
+  "name": "bigin-skills",
+  "version": "1.9.0",
+  "description": "BigIn's collection of Claude Code skills for standardized AI-assisted development — harness setup (governance files + enforcement gates for nuxt/go/nodejs repos) and session handoff. / Bộ skill Claude Code của BigIn cho phát triển với AI chuẩn hoá — thiết lập harness và chuyển tiếp phiên.",
   "author": {
     "name": "Tam Mai",
     "email": "tam.mai@bigin.vn"
   },
   "keywords": [
     "harness",
-    "webapp-harness",
+    "harness-setup",
+    "ai-governance",
+    "enforcement-hooks",
+    "code-conventions",
+    "claude-md",
     "nuxt",
-    "nuxt-v4",
-    "nuxt-ui",
-    "cloudflare",
     "go-backend",
-    "spa",
-    "fullstack",
-    "agent-team",
-    "subagent",
-    "skill-generation",
+    "nodejs-backend",
+    "session-handoff",
     "web-development",
     "claude-code-plugin"
   ]
