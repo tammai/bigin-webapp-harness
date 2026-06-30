@@ -21,7 +21,7 @@ Check for stack indicators:
 
 ```
 Which stack profile?
-1. nuxt   — Nuxt 4 SPA, Pinia, VueUse, Nuxt UI, Vitest, Zod, Cloudflare Pages
+1. nuxt   — Nuxt 4 fullstack (Cloudflare): Nuxt UI, Pinia + Colada, VueUse, nuxt-auth-utils, Drizzle/D1, Vitest, Zod
 2. go     — Go REST API backend
 3. nodejs — Node.js TypeScript REST API backend
 
@@ -32,7 +32,19 @@ Store result as `PROFILE`. Load `references/profile-{PROFILE}.md` for all templa
 
 ---
 
+## Phase 0.5: Nuxt Project Scaffold / Khởi tạo dự án Nuxt
+
+**nuxt profile only.** If `PROFILE = nuxt` **and** the repo has no `nuxt.config.ts`, the repo isn't a Nuxt project yet — scaffold the full app before installing the harness. Follow `references/scaffold-nuxt.md` (clones `tammai/nuxt-fullstack-template` in place, customizes, installs deps + `simple-git-hooks`).
+
+Set `SCAFFOLDED = true` when this runs (the governance overlay reconciles with what the template already provides — see Phases 1 and 5).
+
+Skip this phase entirely if `nuxt.config.ts` already exists (onboarding an existing repo) or for the `go` / `nodejs` profiles.
+
+---
+
 ## Phase 1: Detect Existing Harness / Phát hiện harness hiện có
+
+If `SCAFFOLDED = true`, the template already brought `CLAUDE.md`, `.vscode/settings.json`, eslint config, and a `simple-git-hooks` pre-commit gate. Treat those as pre-existing (do not clobber) and skip straight to adding the BigIn guardrails the template lacks.
 
 Check for existing harness files:
 ```
@@ -60,6 +72,12 @@ Read the content from `references/profile-{PROFILE}.md` → `## CLAUDE.md Templa
 
 Write to `CLAUDE.md` in the project root.
 Skip if `INSTALL_MODE=new` and `CLAUDE.md` already exists.
+
+**If `SCAFFOLDED = true`** (the template shipped its own CLAUDE.md): do **not** overwrite it. Instead append a short pointer block so both coexist:
+```markdown
+## BigIn AI Guardrails
+Task workflow: `AI_TASK_GUIDE.md` · Done = `AI_REVIEW_CHECKLIST.md` · Rules: `.claude/rules/`
+```
 
 ---
 
@@ -91,13 +109,13 @@ Skip each if `INSTALL_MODE=new` and file already exists.
 
 ### 5-1. Pre-commit hook
 
-Read from `references/hook-guard.md` → `## pre-commit: {PROFILE}`.
+**First check for an existing git-hook manager.** If the repo already gates commits via `simple-git-hooks` or `husky` (key in `package.json`), a `.husky/` dir, or an existing `.git/hooks/pre-commit` → **do NOT create `scripts/pre-commit.sh`**. The existing mechanism is the gate; skip to 5-2. (This is the case for `SCAFFOLDED = true` nuxt repos — the template uses `simple-git-hooks` → `pnpm lint-staged`.)
 
-Write to `scripts/pre-commit.sh`, then make it executable: `chmod +x scripts/pre-commit.sh`.
+Otherwise (go / nodejs, or a nuxt repo without a hook manager): read `references/hook-guard.md` → `## pre-commit: {PROFILE}`. Write to `scripts/pre-commit.sh`, then `chmod +x scripts/pre-commit.sh`, and continue to 5-1b.
 
 ### 5-1b. Initialize git + install the hook
 
-The hook lives in `.git/hooks/`, so a git repo must exist first.
+Only when 5-1 created `scripts/pre-commit.sh`. The hook lives in `.git/hooks/`, so a git repo must exist first.
 
 1. **Ensure a git repo.** Check with `git rev-parse --is-inside-work-tree 2>/dev/null`.
    - If it fails (not a repo), run `git init` and tell the user a repo was initialized.
@@ -185,21 +203,23 @@ Print a short summary of what was created and what's next:
 ```
 BigIn harness setup complete for profile: {PROFILE}
 
+[if SCAFFOLDED] Scaffolded Nuxt app from tammai/nuxt-fullstack-template.
+
 Created:
-  CLAUDE.md
   AI_TASK_GUIDE.md
   AI_REVIEW_CHECKLIST.md
-  .claude/rules/conventions.md
   .claude/rules/security.md
   .claude/rules/architecture.md
   .claude/guards/bash-guard.py
   .claude/settings.json [created/merged]
-  scripts/pre-commit.sh
+  CLAUDE.md [created | pointer appended to template's]
+  .claude/rules/conventions.md [skipped if scaffolded — see template + profile]
+  scripts/pre-commit.sh [skipped if a hook manager already exists]
   [.claude/agents/code-reviewer.md] (if opted in)
 
 Enabled:
   git repo [initialized/already present]
-  pre-commit hook [installed/left untouched]
+  pre-commit gate [scripts/pre-commit.sh hook | existing simple-git-hooks/husky]
 
 Next steps:
   1. {LINT} && {TYPECHECK} && {TEST}
@@ -216,15 +236,17 @@ Next steps:
 - `.claude/settings.json` — always merge (never full overwrite if file exists).
 - `README.md` — append only; never overwrite; check for `## AI Onboarding` first.
 - `git init` — only if not already a repo (never re-init).
-- pre-commit hook — install only if absent or already ours; confirm before replacing a foreign hook.
+- pre-commit hook — skip if a hook manager (simple-git-hooks/husky) or hook already exists; otherwise install only if absent or already ours, confirming before replacing a foreign hook.
+- Nuxt scaffold (Phase 0.5) — only if `PROFILE=nuxt` and no `nuxt.config.ts`; confirm before writing. When `SCAFFOLDED`, do not overwrite the template's `CLAUDE.md` / `.vscode/settings.json` / pre-commit — overlay additively.
 - Never delete files not part of the harness.
 
 ---
 
 ## Output Checklist
 
-- [ ] `CLAUDE.md` — profile-specific, ≤30 lines
-- [ ] `.claude/rules/conventions.md` — profile-specific patterns
+- [ ] **nuxt + empty repo** — full app scaffolded from `tammai/nuxt-fullstack-template` (Phase 0.5)
+- [ ] `CLAUDE.md` — profile-specific, ≤30 lines (or pointer appended if the template shipped one)
+- [ ] `.claude/rules/conventions.md` — profile-specific patterns (skipped when scaffolded — template + profile cover it)
 - [ ] `.claude/rules/security.md` — shared security rules
 - [ ] `.claude/rules/architecture.md` — shared base + profile addendum
 - [ ] `AI_TASK_GUIDE.md` — spec gate + task workflow
@@ -240,6 +262,7 @@ Next steps:
 
 ## References
 
+- `references/scaffold-nuxt.md` — in-place Nuxt scaffold from the fullstack template (Phase 0.5)
 - `references/profile-nuxt.md` — templates for nuxt profile
 - `references/profile-go.md` — templates for go profile
 - `references/profile-nodejs.md` — templates for nodejs profile

@@ -1,6 +1,8 @@
 # Nuxt Profile Templates
 
-Stack: Nuxt 4 SPA, Nuxt ESLint, Pinia + Pinia Colada, VueUse, Nuxt UI, nuxt-auth-utils, Zod, Vitest, Cloudflare Pages
+Stack: Nuxt 4 fullstack (Cloudflare Pages), Nuxt ESLint, Pinia + Pinia Colada, VueUse, Nuxt UI, nuxt-auth-utils, Drizzle/D1, Zod, Vitest
+
+Empty repo → scaffolded from `tammai/nuxt-fullstack-template` (SKILL.md Phase 0.5 / `references/scaffold-nuxt.md`).
 
 ---
 
@@ -24,7 +26,7 @@ Every file created or edited is auto-formatted by the Nuxt ESLint module: the `P
 ```markdown
 # CLAUDE.md
 
-Stack: Nuxt 4 SPA · Cloudflare Pages
+Stack: Nuxt 4 fullstack · Cloudflare Pages
 Auth: nuxt-auth-utils (sealed session cookie)
 Runtime: Node ≥22 · pnpm only
 
@@ -47,8 +49,9 @@ See `.claude/rules/` — conventions, security, architecture.
 - No `@ts-ignore` or `as any` without a justifying comment.
 - No unauthenticated endpoints.
 - Auth/session via `nuxt-auth-utils` only — never roll your own session or token store.
-- `openapi.yaml` is the API contract. Types generated from it — never hardcoded.
-- All HTTP requests via `plugins/api.ts` only (Bearer token attached there).
+- `openapi.yaml` is the API contract. Types generated from it (server-side) — never hardcoded.
+- All backend calls via the Nuxt BFF layer (`server/api/`). Backend access token lives in the `nuxt-auth-utils` sealed session — never in the browser.
+- Client-side code calls same-origin `/api/*` only. Never attach auth headers or call the backend URL from the browser.
 
 ## Spec Gate
 Non-trivial features require an approved spec before implementation.
@@ -69,35 +72,36 @@ See `AI_TASK_GUIDE.md` for the workflow.
 - Pinia stores: camelCase with `Store` suffix (`useUserStore.ts`)
 - Types/interfaces: PascalCase
 
-## API Client — single entry point
+## BFF Proxy — single backend entry point
 
-All HTTP calls go through `plugins/api.ts`. This is the only place Bearer tokens are attached.
+The Nuxt server (`server/api/`) is the **only** caller of the backend REST API. The browser calls same-origin `/api/*` — no auth headers, no backend URL exposed to the client.
 
 ```ts
-// plugins/api.ts
-export default defineNuxtPlugin(() => {
-  const api = $fetch.create({
-    baseURL: useRuntimeConfig().public.apiBase,
-    onRequest({ options }) {
-      const token = useCookie('auth_token').value
-      if (token) options.headers.set('Authorization', `Bearer ${token}`)
-    },
+// server/api/users/index.get.ts
+export default defineEventHandler(async (event) => {
+  const { user } = await requireUserSession(event)
+  const config = useRuntimeConfig()
+  return $fetch(`${config.backendUrl}/users`, {
+    headers: { Authorization: `Bearer ${user.token}` },
   })
-  return { provide: { api } }
 })
 ```
 
-Usage: `const { $api } = useNuxtApp()`
-Never call `$fetch` with auth headers outside this plugin.
+Client usage — plain `useFetch`, no auth headers:
+```ts
+const { data } = await useFetch('/api/users')
+```
+
+Never import the backend URL or attach `Authorization` headers in client-side code.
 
 ## OpenAPI Types
 
 Generate types before consuming any new API surface:
 ```sh
-pnpm openapi-typescript openapi.yaml -o types/api.d.ts
+pnpm openapi-typescript openapi.yaml -o server/types/api.d.ts
 ```
 
-Import: `import type { paths, components } from '~/types/api'`
+Import only in server routes: `import type { paths, components } from '~/server/types/api'`
 Never define API response shapes inline — always use generated types.
 
 ## Auth — nuxt-auth-utils
@@ -110,8 +114,7 @@ Session management uses `nuxt-auth-utils`. Never hand-roll session or token stor
 - Protect server routes: `const { user } = await requireUserSession(event)`
 - Hash/verify passwords: `hashPassword` / `verifyPassword` from the module.
 - Session secret comes from `NUXT_SESSION_PASSWORD` (env only — never committed).
-
-Requires server routes (Nitro), which run on Cloudflare Pages even with `ssr: false`. The Bearer token for the separate backend (`plugins/api.ts`) is sourced from the session — not stored separately.
+- The backend access token is stored inside the sealed session. `server/api/` routes read it with `requireUserSession` and forward it as `Authorization: Bearer` — it never leaves the server.
 
 ## State
 - Global state: Pinia stores (`stores/`)

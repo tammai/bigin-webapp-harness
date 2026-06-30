@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-06-30
+
+### Added
+
+- **bigin-harness-setup — Nuxt project scaffolding (nuxt profile):** running setup harness on an empty/non-Nuxt repo now scaffolds the full app, not just governance. New **Phase 0.5** scaffolds in-place from `tammai/nuxt-fullstack-template` (via the `nuxt-fullstack-scaffold` flow: `nuxt.config.ts`, modules, `eslint.config.mjs`, `app/`, `server/`, Drizzle/Wrangler, `simple-git-hooks`), then the harness layer is overlaid additively. New `references/scaffold-nuxt.md`.
+
+### Changed
+
+- **nuxt profile — BFF proxy architecture:** Conventions now document the Nuxt server (`server/api/`) as the sole backend caller. The backend access token lives in the `nuxt-auth-utils` sealed session and never touches the browser. Client-side code calls same-origin `/api/*` only (no auth headers). `openapi.yaml` types are generated server-side (`server/types/api.d.ts`). The old `plugins/api.ts` browser-side Bearer pattern is replaced by a `server/api/` proxy example. CLAUDE.md hard rules updated accordingly.
+- **Governance overlay reconciles with the scaffolded template:** when `SCAFFOLDED`, the skill does not overwrite the template's `CLAUDE.md` (appends a pointer) or `.vscode/settings.json` (merges), and **skips `scripts/pre-commit.sh`** when a hook manager (`simple-git-hooks`/`husky`) already gates commits. It adds only the BigIn guardrails the template lacks: `.claude/guards/bash-guard.py`, `.claude/settings.json` (permissions + PreToolUse bash-guard + PostToolUse `pnpm lint --fix`), `AI_TASK_GUIDE.md`, `AI_REVIEW_CHECKLIST.md`, `.claude/rules/{security,architecture}.md`.
+- **nuxt profile relabeled SPA → fullstack (Cloudflare)** across the Phase 0 menu, README, and profile spec, to match what actually gets scaffolded.
+
+---
+
 ## [1.9.1] - 2026-06-30
 
 ### Changed

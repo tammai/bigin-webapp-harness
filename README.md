@@ -31,11 +31,13 @@ Sets up a consistent "harness level" on any repo so team members of mixed skill 
 
 | Profile  | Stack                                                                          |
 | -------- | ------------------------------------------------------------------------------ |
-| `nuxt`   | Nuxt 4 (SPA), Nuxt ESLint, Pinia + Pinia Colada, VueUse, Nuxt UI, nuxt-auth-utils, Zod, Vitest, Cloudflare Pages |
+| `nuxt`   | Nuxt 4 fullstack (Cloudflare), Nuxt ESLint, Pinia + Pinia Colada, VueUse, Nuxt UI, nuxt-auth-utils, Drizzle/D1, Zod, Vitest. Empty repo → scaffolded from `tammai/nuxt-fullstack-template` |
 | `go`     | Go REST API (Gin)                                                              |
 | `nodejs` | Node.js TypeScript REST API                                                    |
 
 ### What gets generated
+
+**nuxt on an empty repo:** the full app is first scaffolded from `tammai/nuxt-fullstack-template` (via the `nuxt-fullstack-scaffold` flow — `nuxt.config.ts`, modules, `eslint.config.mjs`, `app/`, `server/`, Drizzle, Wrangler, `simple-git-hooks`). The harness layer below is then overlaid additively, reconciling with what the template already provides.
 
 ```
 your-repo/
