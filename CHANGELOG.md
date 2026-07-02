@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.1] - 2026-07-02
+
+### Fixed
+
+- **`bigin-harness-setup`:** scaffolded repos now surface the Claude Code workspace-trust step, which was previously undocumented and caused the `.claude/settings.json` `permissions.allow` entries to be silently ignored on first run in a new/moved workspace. Phase 6's `## AI Onboarding` README block adds a step to accept the trust dialog (or set `hasTrustDialogAccepted` in `~/.claude.json` for headless setups); Phase 7's summary calls it out as next step 1.
+
 ## [1.16.0] - 2026-07-02
 
 ### Added

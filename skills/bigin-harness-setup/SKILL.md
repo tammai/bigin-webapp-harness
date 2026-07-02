@@ -229,13 +229,14 @@ If not present, append the following block (replace `{LINT}`, `{TYPECHECK}`, `{T
 ## AI Onboarding
 
 1. Clone the repo and install dependencies.
-2. Install git hook:
+2. Run `claude` in the repo root and accept the workspace trust dialog — this repo ships a `.claude/settings.json` with pre-approved permissions, which Claude Code only applies after you trust the folder. (If the dialog doesn't appear, or you're on a headless/non-interactive setup, set `hasTrustDialogAccepted: true` for this path in `~/.claude.json`.)
+3. Install git hook:
    ```sh
    ln -sf ../../scripts/pre-commit.sh .git/hooks/pre-commit && chmod +x scripts/pre-commit.sh
    ```
-3. Verify gates pass: `{LINT} && {TYPECHECK} && {TEST}`
-4. Read `CLAUDE.md` → `AI_TASK_GUIDE.md`.
-5. Do one scoped task end-to-end through all gates to confirm the setup works.
+4. Verify gates pass: `{LINT} && {TYPECHECK} && {TEST}`
+5. Read `CLAUDE.md` → `AI_TASK_GUIDE.md`.
+6. Do one scoped task end-to-end through all gates to confirm the setup works.
 ```
 
 If no `README.md` exists: skip this phase (do not create one).
@@ -274,10 +275,11 @@ Enabled:
   [sprint-distill available — run it at sprint end to fold merged work into knowledge/ and bigin-skills] (if opted in)
 
 Next steps:
-  1. {LINT} && {TYPECHECK} && {TEST}
-  2. Read CLAUDE.md + AI_TASK_GUIDE.md
-  3. One scoped task through all gates — confirm the harness works.
-  [4. Add `uv run tools/knowledge_validate.py` to your existing CI — this skill only wires it into CI it generated itself.] (if opted in and CI_PROVIDER=no but foreign CI config detected)
+  1. First `claude` run here: accept the workspace trust dialog, or the 19 permissions.allow entries in .claude/settings.json are ignored (Claude Code will print a warning naming this path).
+  2. {LINT} && {TYPECHECK} && {TEST}
+  3. Read CLAUDE.md + AI_TASK_GUIDE.md
+  4. One scoped task through all gates — confirm the harness works.
+  [5. Add `uv run tools/knowledge_validate.py` to your existing CI — this skill only wires it into CI it generated itself.] (if opted in and CI_PROVIDER=no but foreign CI config detected)
 ```
 
 ---
