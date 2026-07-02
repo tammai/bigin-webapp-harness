@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] - 2026-07-02
+
+### Added
+
+- **`sprint-distill` skill:** new standalone skill (`skills/sprint-distill/`) that replaces a manual NotebookLM end-of-sprint pass with a git-native distillation step: merged PRs + `knowledge/log.md` cursor → sprint-distill → `knowledge/` + `bigin-skills` updates → knowledge validator gate. Determines sprint scope from the last `knowledge/log.md` entry (asks for a start date if undeterminable, or falls back to a skills-only mode if the repo has no Knowledge Bundle at all). Gathers merged PRs, touched concept files, current `.claude/rules/`, and any pasted out-of-repo material. Classifies every candidate with a strict sorting rule — WHAT/WHY → `knowledge/`, HOW-we-work → `bigin-skills`, neither → dropped and reported, never both, link don't copy — then proposes the full change set and **stops for approval** before writing anything. On approval: applies changes, runs `tools/knowledge_validate.py` best-effort (never blocks on missing tooling), appends the log entry last. First-class stale-concept detection (diff-touched resources whose concept file wasn't updated; index-unreachable concepts). Explicitly does not trigger on single-PR/single-change review — that stays `/code-review`.
+- **`bigin-harness-setup` wiring:** Phase 5.5 step 5's conditional CLAUDE.md append (when `KNOWLEDGE_BUNDLE = true`) now also points at `sprint-distill`; Phase 7's summary notes its availability under the same condition.
+
 ## [1.15.1] - 2026-07-02
 
 ### Fixed

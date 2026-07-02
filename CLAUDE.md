@@ -19,6 +19,8 @@ skills/
   nuxt-scaffold/         ← scaffolds a Nuxt 4 BFF app (npm create nuxt, no clone)
     SKILL.md
     references/          ← bootstrap, modules, artifacts
+  sprint-distill/        ← end-of-sprint distillation into knowledge/ + bigin-skills
+    SKILL.md
   session-handoff/       ← session state persistence (SESSION.md)
     SKILL.md
 ```
@@ -59,6 +61,10 @@ Key reference files:
 - `references/bootstrap.md` — the canonical init + module-install + verify command sequence
 - `references/modules.md` — BFF preset, optional-modules menu, Drizzle opt-in
 - `references/artifacts.md` — every file written/merged into the project
+
+### sprint-distill
+
+End-of-sprint distillation, replacing a manual NotebookLM pass: merged PRs + touched `knowledge/` concepts since the last `knowledge/log.md` entry → classified proposal (WHAT/WHY → `knowledge/`, HOW-we-work → `bigin-skills`, neither → dropped and reported, never both) → stops for approval → applies, runs the knowledge validator best-effort, appends the log entry last. Falls back to a skills-only mode if the target repo has no Knowledge Bundle. Doesn't trigger on single-PR review — that's `/code-review`.
 
 ### session-handoff
 

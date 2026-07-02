@@ -13,6 +13,7 @@ Skills for standardized, AI-assisted development across BigIn's stacks.
 | ---------------------- | -------------------------------------------------------------------------------------------------------- |
 | **bigin-harness-setup** | Scaffolds an AI workflow harness into a repo — `CLAUDE.md`, scoped rules, and enforcement gates. Profiles: `nuxt`, `go`, `nodejs`. |
 | **nuxt-scaffold**       | Scaffolds a Nuxt 4 BFF app from scratch — non-interactive `npm create nuxt@latest` + BFF preset + config/sample code. No GitHub clone. |
+| **sprint-distill**      | End-of-sprint distillation: merged PRs + touched `knowledge/` concepts → proposal-first `knowledge/` and `bigin-skills` updates. Replaces a manual NotebookLM pass. |
 | **session-handoff**     | Saves session state (tasks, decisions, uncommitted changes) to `SESSION.md` and restores it on resume.   |
 
 ---
@@ -81,6 +82,24 @@ The skill detects the stack profile (or asks), confirms before overwriting anyth
 
 ---
 
+## sprint-distill
+
+Replaces a manual NotebookLM end-of-sprint pass with a git-native distillation step: merged PRs + log → sprint-distill → `knowledge/` + `bigin-skills` → knowledge validator gate.
+
+Determines sprint scope from the last entry in `knowledge/log.md` (asks for a start date if there's no bundle yet or no dated entry). Gathers merged PRs since that date, touched concept files, and current `.claude/rules/`, plus any pasted out-of-repo material (meeting notes, transcripts, client docs). Classifies every candidate learning with a strict rule — WHAT/WHY → `knowledge/`, HOW-we-work → `bigin-skills`, neither → dropped and reported, never both — then proposes the full set of changes and **stops** for approval before writing anything. On approval: applies the changes, runs the knowledge validator if present, appends the log entry last.
+
+Trigger with:
+
+```
+Sprint distill
+Distill this sprint
+Chưng cất sprint
+```
+
+Doesn't trigger on single-PR or single-change review — use `/code-review` for that.
+
+---
+
 ## Installation / Cài đặt
 
 ### Via Marketplace
@@ -120,6 +139,8 @@ bigin-skills/
 │   │       ├── bootstrap.md       ← non-interactive init + module install + verify
 │   │       ├── modules.md         ← BFF preset, optional modules, Drizzle opt-in
 │   │       └── artifacts.md       ← config + sample code written into the project
+│   ├── sprint-distill/            ← end-of-sprint distillation (knowledge/ + bigin-skills)
+│   │   └── SKILL.md
 │   └── session-handoff/           ← session state persistence
 │       └── SKILL.md
 ├── CHANGELOG.md

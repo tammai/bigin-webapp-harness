@@ -9,7 +9,7 @@
     {
       "name": "bigin-skills",
       "source": "./",
-      "description": "BigIn's Claude Code skills — harness setup (governance + enforcement gates for nuxt/go/nodejs) and session handoff.",
+      "description": "BigIn's Claude Code skills — harness setup (governance + enforcement gates for nuxt/go/nodejs), end-of-sprint knowledge distillation, and session handoff.",
       "author": {
         "name": "Tam Mai",
         "email": "tam.mai@bigin.vn"
@@ -17,7 +17,7 @@
       "homepage": "https://github.com/tammai/bigin-skills",
       "repository": "https://github.com/tammai/bigin-skills",
       "license": "MIT",
-      "keywords": ["harness", "harness-setup", "ai-governance", "enforcement-hooks", "nuxt", "go-backend", "nodejs-backend", "session-handoff"]
+      "keywords": ["harness", "harness-setup", "ai-governance", "enforcement-hooks", "nuxt", "go-backend", "nodejs-backend", "session-handoff", "sprint-distill"]
     }
   ]
 }
