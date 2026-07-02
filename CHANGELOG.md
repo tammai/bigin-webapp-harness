@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.3] - 2026-07-02
+
+### Fixed
+
+- **`nuxt-scaffold` / `bigin-harness-setup` (nuxt profile):** the `PostToolUse` auto-format hook ran `pnpm lint --fix --cache` — ESLint's whole-repo `.` target — on every single Write/Edit/MultiEdit. Confirmed in the field: a routine edit to one file triggered a repo-wide reformat of 10 unrelated pre-existing files (848 lines in one). This is especially dangerous for `bigin-harness-setup`'s existing-repo onboarding path (Phase 5-3), which by design can start with pre-existing lint debt. Replaced with `.claude/guards/lint-fix-file.py`, a small hook script that reads the touched file's path from the `PostToolUse` stdin JSON and ESLint-`--fix`es only that file. Written in Python (matching `bash-guard.py`'s existing convention) rather than Node, since this is Claude Code harness tooling, not a project dependency. `nuxt-scaffold` writes the script; `bigin-harness-setup` writes it too when onboarding an existing nuxt repo that skipped `nuxt-scaffold`.
+
+### Changed
+
+- **`bigin-harness-setup` / `nuxt-scaffold` docs:** the documented ESLint stylistic config only ever listed the template's one explicit override (`commaDangle: 'never'`, plus a redundant `braceStyle: '1tbs'`) — now also spells out the other rules actually in effect (`indent: 2`, `quotes: 'single'`, `semi: false`), which come from `@stylistic/eslint-plugin`'s own defaults rather than anything the template writes. No generated file changed — `nuxt.config.ts` still only sets `commaDangle`/`braceStyle`, as verified against a fresh `create-nuxt@latest --template ui` scaffold.
+
 ## [1.16.2] - 2026-07-02
 
 ### Changed

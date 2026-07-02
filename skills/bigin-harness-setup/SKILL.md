@@ -138,13 +138,13 @@ Only when 5-1 created `scripts/pre-commit.sh`. The hook lives in `.git/hooks/`, 
 
 Read from `references/hook-guard.md` → `## bash-guard.py`. Write to `.claude/guards/bash-guard.py`.
 
-> nuxt auto-format needs no script — it's a `PostToolUse` hook in the nuxt settings.json template that runs `pnpm lint --fix` (the Nuxt ESLint module) after every Write/Edit.
+> nuxt auto-format also needs a guard script — `.claude/guards/lint-fix-file.py`, ESLint `--fix` scoped to the single touched file (a blanket `pnpm lint --fix` would rewrite every pre-existing lint violation in the repo on the first edit). If `SCAFFOLDED = true`, `nuxt-scaffold` already wrote it. Otherwise (onboarding an existing nuxt repo), write it now from `skills/nuxt-scaffold/references/artifacts.md` → `## .claude/guards/lint-fix-file.py (write)` — single source of truth, don't duplicate the script body here.
 
 ### 5-3. .claude/settings.json
 
 For **nuxt**:
-- **If `SCAFFOLDED = true`**: the `nuxt-scaffold` skill already wrote `.claude/settings.json` with `permissions.allow` + a `PostToolUse` `pnpm lint --fix` hook. Merge **only** the `PreToolUse` `bash-guard.py` hook (and any missing `permissions.allow` entries). Do **not** re-add `PostToolUse` — it is already present. Merge per-event; show additions before writing.
-- **Otherwise** (onboarding an existing nuxt repo): read the full template from `references/profile-nuxt.md` → `## settings.json Template`. If `.claude/settings.json` exists, merge the `hooks` block + missing `permissions.allow` entries (per-event, never drop the user's); if not, write fresh.
+- **If `SCAFFOLDED = true`**: the `nuxt-scaffold` skill already wrote `.claude/settings.json` with `permissions.allow` + a `PostToolUse` `lint-fix-file.py` hook (and the script itself). Merge **only** the `PreToolUse` `bash-guard.py` hook (and any missing `permissions.allow` entries). Do **not** re-add `PostToolUse` — it is already present. Merge per-event; show additions before writing.
+- **Otherwise** (onboarding an existing nuxt repo): write `.claude/guards/lint-fix-file.py` per 5-2's note above if missing, then read the full settings.json template from `references/profile-nuxt.md` → `## settings.json Template`. If `.claude/settings.json` exists, merge the `hooks` block + missing `permissions.allow` entries (per-event, never drop the user's); if not, write fresh.
 
 For **go** / **nodejs**: read the template from `references/profile-{PROFILE}.md` → `## settings.json Template`. If the file exists, merge the `hooks` block + missing `permissions.allow` entries (per-event); otherwise write fresh.
 
@@ -258,6 +258,7 @@ Created:
   .claude/rules/security.md
   .claude/rules/architecture.md
   .claude/guards/bash-guard.py
+  [.claude/guards/lint-fix-file.py] (nuxt only; skipped if `nuxt-scaffold` already wrote it)
   .claude/settings.json [created/merged]
   CLAUDE.md [created]
   .claude/rules/conventions.md
@@ -310,7 +311,8 @@ Next steps:
 - [ ] `AI_REVIEW_CHECKLIST.md` — profile commands filled in
 - [ ] `scripts/pre-commit.sh` — lint + typecheck + test for profile, executable
 - [ ] `.claude/guards/bash-guard.py` — blocks `--no-verify` and force-push to main
-- [ ] `.claude/settings.json` — guards wired (nuxt also gets a PostToolUse `pnpm lint --fix` auto-format hook) + profile permissions
+- [ ] **nuxt only** — `.claude/guards/lint-fix-file.py` — ESLint `--fix` scoped to the touched file (written by `nuxt-scaffold` if `SCAFFOLDED`, else by this skill)
+- [ ] `.claude/settings.json` — guards wired (nuxt also gets a PostToolUse `lint-fix-file.py` auto-format hook) + profile permissions
 - [ ] **nuxt only** — `.vscode/settings.json` with ESLint format-on-save (Prettier disabled), merged if it existed
 - [ ] git repo initialized (if it wasn't one) and `.git/hooks/pre-commit` installed (or foreign hook left untouched with confirmation)
 - [ ] `README.md` — AI Onboarding section appended (if README existed)

@@ -17,7 +17,7 @@ The BFF preset is installed by default. Optional modules and the Drizzle/D1 laye
 
 The `--template ui` init installs whatever versions the resolved `create-nuxt@latest` release bundled at publish time — not necessarily current. `references/bootstrap.md` → Stage 1b immediately refreshes all of these (plus `nuxt`, `@pinia/nuxt`, `nuxt-auth-utils`, `@vueuse/nuxt`) per `VERSION_POLICY`, so a stale template snapshot never reaches the scaffolded app.
 
-The template also ships the eslint stylistic config (`commaDangle: 'never'`, `braceStyle: '1tbs'`), `app.vue`, `app.config.ts`, `pages/index.vue`, `eslint.config.mjs`, and `main.css`.
+The template also ships the eslint stylistic config — explicit override `commaDangle: 'never'` (default `'always-multiline'`) plus `braceStyle: '1tbs'` (same as `@stylistic/eslint-plugin`'s own default, restated); the rest of the effective rules (`indent: 2`, `quotes: 'single'`, `semi: false`) come from that plugin's defaults, not from anything the template writes. Also ships `app.vue`, `app.config.ts`, `pages/index.vue`, `eslint.config.mjs`, and `main.css`.
 
 ### Stage 2 — BFF preset packages (plain packages only; Nuxt modules installed in Stage 1)
 

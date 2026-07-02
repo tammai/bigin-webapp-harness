@@ -228,9 +228,37 @@ The template already provides `build`, `dev`, `preview`, `postinstall`, `lint` (
 
 ---
 
+## .claude/guards/lint-fix-file.py (write)
+
+Backs the `PostToolUse` auto-format hook below. Deliberately scoped to the single file the tool call touched, **not** `pnpm lint --fix` across the whole repo: `bigin-harness-setup` also runs this profile when onboarding an *existing* nuxt repo (Phase 5-3), which can already carry pre-existing lint violations — a blanket `eslint . --fix` would silently rewrite unrelated files on every edit (confirmed: reformatted 10 unrelated files, 848 lines in one, on a single routine edit). Python, matching `bash-guard.py`'s convention (`references/hook-guard.md`) — this is Claude Code harness tooling, not a project dependency, so it doesn't need to match the app's own stack.
+
+```python
+#!/usr/bin/env python3
+"""
+Auto-formats only the file just written/edited via ESLint --fix.
+Claude Code PostToolUse hook — reads tool input from stdin.
+"""
+import json
+import subprocess
+import sys
+
+try:
+    data = json.load(sys.stdin)
+except json.JSONDecodeError:
+    sys.exit(0)
+
+file_path = data.get("tool_input", {}).get("file_path")
+if not file_path:
+    sys.exit(0)
+
+subprocess.run(["pnpm", "exec", "eslint", "--fix", "--cache", file_path])
+```
+
+---
+
 ## .claude/settings.json (write / merge)
 
-Pre-approved commands + the auto-format hook. The **`PostToolUse` hook runs `pnpm lint --fix` after every `Write`/`Edit`/`MultiEdit`** — that is the Nuxt ESLint format command (`eslint . --fix`); Nuxt UI uses ESLint as the sole formatter (Prettier is disabled). **`PostToolUse` only — no `PreToolUse`**: the `bigin-harness-setup` skill adds the `PreToolUse` `bash-guard.py` hook (governance — including the `--no-verify`/force-push blocks) when it overlays later. Until then there is no gate on git commands, so `git push` is deliberately **not** pre-approved here — it stays a per-call confirmation prompt so nothing reaches a remote before governance is in place. Local, reversible git commands (`add`, `commit`, `stash`, etc.) are pre-approved.
+Pre-approved commands + the auto-format hook. The **`PostToolUse` hook runs `.claude/guards/lint-fix-file.py` after every `Write`/`Edit`/`MultiEdit`**, ESLint-fixing only the touched file (see above) — Nuxt UI uses ESLint as the sole formatter (Prettier is disabled). **`PostToolUse` only — no `PreToolUse`**: the `bigin-harness-setup` skill adds the `PreToolUse` `bash-guard.py` hook (governance — including the `--no-verify`/force-push blocks) when it overlays later. Until then there is no gate on git commands, so `git push` is deliberately **not** pre-approved here — it stays a per-call confirmation prompt so nothing reaches a remote before governance is in place. Local, reversible git commands (`add`, `commit`, `stash`, etc.) are pre-approved.
 
 ```json
 {
@@ -261,7 +289,7 @@ Pre-approved commands + the auto-format hook. The **`PostToolUse` hook runs `pnp
       {
         "matcher": "Write|Edit|MultiEdit",
         "hooks": [
-          { "type": "command", "command": "pnpm lint --fix --cache" }
+          { "type": "command", "command": "python3 .claude/guards/lint-fix-file.py" }
         ]
       }
     ]

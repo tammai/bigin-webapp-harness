@@ -54,7 +54,7 @@ The skill is **idempotent** — re-running on a set-up repo never clobbers witho
 
 Scaffolds a Nuxt 4 BFF app **from scratch** into an empty repo — no GitHub template clone. The skill runs: non-interactive `npm create nuxt@latest` (`--template ui`, `--packageManager pnpm`, `--gitInit`, `--force`) → install the BFF preset (`pinia`, `nuxt-auth-utils`, `@vueuse/nuxt`, `@pinia/colada`, `zod`, `vitest`, `@nuxt/test-utils`, `simple-git-hooks`, `lint-staged`, `openapi-typescript`) → apply config + sample BFF code. Optional module extras (`image`, `content`) and an opt-in Drizzle + Cloudflare D1 layer. Invoked by `bigin-harness-setup` Phase 0.5; also usable standalone.
 
-**Ownership split:** `nuxt-scaffold` owns the Nuxt project (config, sample code, `simple-git-hooks`, `.claude/settings.json` with permissions + a `PostToolUse` lint-fix hook). Governance (`CLAUDE.md`, `.claude/rules/`, `bash-guard.py` + its `PreToolUse` hook) stays with `bigin-harness-setup`.
+**Ownership split:** `nuxt-scaffold` owns the Nuxt project (config, sample code, `simple-git-hooks`, `.claude/settings.json` with permissions + a `PostToolUse` lint-fix hook, and the `.claude/guards/lint-fix-file.py` script it runs — Python is fine here since it's Claude Code tooling, not a project dependency). Governance (`CLAUDE.md`, `.claude/rules/`, `bash-guard.py` + its `PreToolUse` hook) stays with `bigin-harness-setup`.
 
 Key reference files:
 

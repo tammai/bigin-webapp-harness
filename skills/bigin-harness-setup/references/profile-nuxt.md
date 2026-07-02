@@ -17,7 +17,7 @@ build:      pnpm build
 dev:        pnpm dev
 ```
 
-Every file created or edited is auto-formatted by the Nuxt ESLint module: the `PostToolUse` hook in `.claude/settings.json` runs `pnpm lint --fix` after every Write/Edit. No custom script — it uses the project's own `lint` script (`@nuxt/eslint` flat config).
+Every file created or edited is auto-formatted by the Nuxt ESLint module: the `PostToolUse` hook in `.claude/settings.json` runs `.claude/guards/lint-fix-file.py`, which ESLint-`--fix`es only the touched file. Scoped deliberately — a blanket `pnpm lint --fix` across the whole repo would rewrite every pre-existing lint violation on the first edit, which matters here since this profile also onboards existing nuxt repos (Phase 5-3) that can already carry lint debt. `pnpm lint --fix` above is still the manual, whole-repo command a human runs on demand.
 
 ---
 
@@ -130,17 +130,18 @@ Session management uses `nuxt-auth-utils`. Never hand-roll session or token stor
 Formatting is ESLint via `@nuxt/eslint`. **Prettier is disabled** — never add it.
 
 - `eslint.config.mjs`: `import withNuxt from './.nuxt/eslint.config.mjs'` → `export default withNuxt()`.
-- Stylistic config in `nuxt.config.ts`:
+- Stylistic config in `nuxt.config.ts` (only `commaDangle` is an explicit override; the rest are `@stylistic/eslint-plugin`'s own defaults, listed here for clarity — don't add them to `nuxt.config.ts`):
   ```ts
   eslint: { config: { stylistic: { commaDangle: 'never', braceStyle: '1tbs' } } }
   ```
+  Effective rules: `indent: 2`, `quotes: 'single'`, `semi: false`, `braceStyle: '1tbs'`, `commaDangle: 'never'` (default is `'always-multiline'` — the template overrides it).
 - Lint command: `eslint .` (the `lint` script). Fix: `eslint . --fix`.
 - Commit-time fix via `lint-staged` in `package.json`:
   ```json
   "lint-staged": { "*.{ts,vue,js,mjs}": "eslint --fix" }
   ```
 - Editor format-on-save uses the ESLint extension (`.vscode/settings.json`), not Prettier.
-- Claude auto-formats every Write/Edit via the `pnpm lint --fix` `PostToolUse` hook in `.claude/settings.json`.
+- Claude auto-formats every Write/Edit via the `lint-fix-file.py` `PostToolUse` hook in `.claude/settings.json` (ESLint `--fix`, scoped to the touched file only).
 ```
 
 ---
@@ -164,7 +165,7 @@ Formatting is ESLint via `@nuxt/eslint`. **Prettier is disabled** — never add 
 
 ## settings.json Template
 
-Governance superset: `permissions` + `PostToolUse` lint-fix (the `nuxt-scaffold` baseline) **plus** the `PreToolUse` `bash-guard.py` hook (governance). Used when onboarding an existing nuxt repo (Phase 5-3). Keep the `permissions` / `PostToolUse` keys in sync with `skills/nuxt-scaffold/references/artifacts.md`.
+Governance superset: `permissions` + `PostToolUse` lint-fix (the `nuxt-scaffold` baseline) **plus** the `PreToolUse` `bash-guard.py` hook (governance). Used when onboarding an existing nuxt repo (Phase 5-3) — also write `.claude/guards/lint-fix-file.py` if it's missing (script body: `skills/nuxt-scaffold/references/artifacts.md` → `## .claude/guards/lint-fix-file.py (write)`, single source of truth). Keep the `permissions` / `PostToolUse` keys in sync with `skills/nuxt-scaffold/references/artifacts.md`.
 
 ```json
 {
@@ -209,7 +210,7 @@ Governance superset: `permissions` + `PostToolUse` lint-fix (the `nuxt-scaffold`
         "hooks": [
           {
             "type": "command",
-            "command": "pnpm lint --fix --cache"
+            "command": "python3 .claude/guards/lint-fix-file.py"
           }
         ]
       }
